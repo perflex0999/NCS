@@ -3,7 +3,7 @@
     <div class="login-card ncs-enter">
       <div class="brand">
         <div class="brand-dot"></div>
-        <h1>充电运营管理后台</h1>
+        <h1>熠熠ee 充电运营管理后台</h1>
       </div>
       <p class="sub">智能充电桩运营服务平台</p>
       <el-form @submit.prevent>

@@ -3,7 +3,7 @@
     <el-aside width="220px" class="aside">
       <div class="logo">
         <span class="logo-dot"></span>
-        <span class="logo-text">充电运营平台</span>
+        <span class="logo-text">熠熠ee</span>
       </div>
       <el-menu :default-active="$route.path" router class="menu">
         <el-menu-item index="/dashboard"><span class="menu-ico">📊</span><span>数据统计</span></el-menu-item>
@@ -18,7 +18,7 @@
       <el-header class="header">
         <span class="title">{{ $route.meta.title }}</span>
         <div class="header-actions">
-          <el-button link type="primary" @click="$router.push('/bigscreen')">📺 数据大屏</el-button>
+          <el-button link type="primary" @click="openBigScreen">📺 数据大屏</el-button>
           <el-button link type="primary" @click="logout">退出登录</el-button>
         </div>
       </el-header>
@@ -41,6 +41,9 @@ const router = useRouter()
 const logout = () => {
   clearToken()
   router.replace('/login')
+}
+const openBigScreen = () => {
+  window.open('/bigscreen/', '_blank')
 }
 </script>
 

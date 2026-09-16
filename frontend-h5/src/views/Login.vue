@@ -2,7 +2,7 @@
   <div class="login-page">
     <div class="brand ncs-enter">
       <div class="brand-dot"></div>
-      <h1>充电服务</h1>
+      <h1>熠熠ee</h1>
       <p>智能充电桩运营服务平台</p>
     </div>
     <div class="ncs-card login-card ncs-enter">
