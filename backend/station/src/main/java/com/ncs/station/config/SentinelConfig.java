@@ -21,7 +21,7 @@ public class SentinelConfig {
         FlowRule rule = new FlowRule();
         rule.setResource("/api/station/nearby");
         rule.setGrade(RuleConstant.FLOW_GRADE_QPS);
-        rule.setCount(2000);
+        rule.setCount(2500);
         rules.add(rule);
         FlowRuleManager.loadRules(rules);
     }

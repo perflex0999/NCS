@@ -18,8 +18,8 @@ public class SentinelConfig {
     @PostConstruct
     public void initFlowRules() {
         List<FlowRule> rules = new ArrayList<>();
-        rules.add(buildFlowRule("/api/charge/start", 300));
-        rules.add(buildFlowRule("/api/charge/end", 300));
+        rules.add(buildFlowRule("/api/charge/start", 400));
+        rules.add(buildFlowRule("/api/charge/end", 400));
         FlowRuleManager.loadRules(rules);
     }
 
