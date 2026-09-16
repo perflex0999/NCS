@@ -1,0 +1,8 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: ncs-order
+
+# TODO(阶段3): 接入 Nacos 注册中心 + 配置中心

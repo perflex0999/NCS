@@ -1,0 +1,8 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ncs-gateway
+
+# TODO(阶段3): 配置网关路由、Nacos 注册、Sentinel 限流

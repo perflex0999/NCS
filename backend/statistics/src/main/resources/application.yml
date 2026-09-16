@@ -1,0 +1,8 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: ncs-statistics
+
+# TODO(阶段3): 接入 Nacos 注册中心 + 配置中心

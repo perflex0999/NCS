@@ -1,0 +1,8 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: ncs-agent
+
+# TODO(阶段5): 接入大模型 API（key / base_url / model 放配置文件）

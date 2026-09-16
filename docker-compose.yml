@@ -1,0 +1,103 @@
+# 本地开发中间件编排
+# 用法：docker compose up -d
+# 密码统一由环境变量 ROOT_PASSWORD 控制（默认 Ncs@123456），可复制 .env.example 为 .env 覆盖。
+# 若镜像拉取缓慢，请在 Docker Desktop 设置中配置国内镜像加速器。
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ncs-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD:-Ncs@123456}
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${ROOT_PASSWORD:-Ncs@123456}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: ncs-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--requirepass", "${ROOT_PASSWORD:-Ncs@123456}"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${ROOT_PASSWORD:-Ncs@123456}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # RocketMQ 5.x：NameServer + Broker 两个容器
+  rocketmq-namesrv:
+    image: apache/rocketmq:5.1.4
+    container_name: ncs-rocketmq-namesrv
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - "9876:9876"
+    command: sh mqnamesrv
+
+  rocketmq-broker:
+    image: apache/rocketmq:5.1.4
+    container_name: ncs-rocketmq-broker
+    restart: unless-stopped
+    depends_on:
+      - rocketmq-namesrv
+    environment:
+      TZ: Asia/Shanghai
+      NAMESRV_ADDR: rocketmq-namesrv:9876
+    ports:
+      - "10909:10909"
+      - "10911:10911"
+      - "10912:10912"
+    command: sh mqbroker -n rocketmq-namesrv:9876
+
+  # EMQX：设备 MQTT 接入（充电桩上报）
+  emqx:
+    image: emqx/emqx:5.5.1
+    container_name: ncs-emqx
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - "1883:1883"    # MQTT
+      - "8083:8083"    # MQTT over WebSocket
+      - "18083:18083"  # Dashboard（默认账号 admin / public）
+    healthcheck:
+      test: ["CMD", "emqx", "ctl", "status"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  # Nacos：注册中心 + 配置中心（standalone 模式）
+  nacos:
+    image: nacos/nacos-server:v2.3.2
+    container_name: ncs-nacos
+    restart: unless-stopped
+    environment:
+      MODE: standalone
+      TZ: Asia/Shanghai
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+    volumes:
+      - nacos-data:/home/nacos/data
+
+volumes:
+  mysql-data:
+  redis-data:
+  nacos-data:
