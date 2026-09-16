@@ -14,6 +14,8 @@ const routes = [
     ]
   },
   { path: '/scan', name: 'ScanPage', component: () => import('../views/ScanPage.vue') },
+  { path: '/search', name: 'SearchPage', component: () => import('../views/SearchPage.vue') },
+  { path: '/coupons', name: 'CouponPage', component: () => import('../views/CouponPage.vue') },
   { path: '/station/:id', name: 'StationDetail', component: () => import('../views/StationDetail.vue') },
   { path: '/charge', name: 'Charging', component: () => import('../views/Charging.vue') },
   { path: '/orders', name: 'OrderList', component: () => import('../views/OrderList.vue') }

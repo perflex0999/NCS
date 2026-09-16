@@ -27,8 +27,8 @@
       <div class="entry" @click="$router.push('/scan')">
         <span class="entry-ico">⚡</span><span>扫码充电</span><span class="arrow">›</span>
       </div>
-      <div class="entry">
-        <span class="entry-ico">🎫</span><span>我的优惠券</span><span class="arrow">›</span>
+      <div class="entry" @click="$router.push('/coupons')">
+        <span class="entry-ico">🎫</span><span>我的优惠券</span><span class="badge">2 张可用</span><span class="arrow">›</span>
       </div>
     </div>
 
@@ -88,7 +88,8 @@ const logout = () => {
 }
 .entry:last-child { border-bottom: none; }
 .entry-ico { font-size: 20px; }
-.arrow { margin-left: auto; color: #C0C7D2; font-size: 20px; }
+.badge { margin-left: auto; font-size: 11px; color: #3EC9C0; background: #EBF9F1; padding: 2px 8px; border-radius: 999px; }
+.arrow { margin-left: 6px; color: #C0C7D2; font-size: 20px; }
 .logout-wrap { margin-top: auto; padding: 8px 20px 4px; }
 .logout-btn { color: #F06A6A; background: #fff; border: 1px solid #FAD2D2; }
 </style>
