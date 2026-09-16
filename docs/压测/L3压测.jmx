@@ -27,6 +27,10 @@
       <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="登录(取token)" enabled="true">
         <stringProp name="ThreadGroup.num_threads">1</stringProp>
         <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="循环控制器" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
       </SetupThreadGroup>
       <hashTree>
         <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Content-Type头" enabled="true">
@@ -65,7 +69,7 @@
           <stringProp name="cacheKey">true</stringProp>
           <stringProp name="filename"></stringProp>
           <stringProp name="parameters"></stringProp>
-          <stringProp name="script">props.put(&quot;token&quot;, vars.get(&quot;token&quot;))</stringProp>
+          <stringProp name="script">def t = vars.get(&quot;token&quot;); if (t != null) { props.put(&quot;token&quot;, t) }</stringProp>
           <stringProp name="scriptLanguage">groovy</stringProp>
         </JSR223PostProcessor>
         <hashTree/>
