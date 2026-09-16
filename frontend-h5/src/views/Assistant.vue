@@ -22,10 +22,10 @@
         <div class="welcome-sub">试着问我：{{ currentScenario.hint }}</div>
       </div>
       <div v-for="(m, i) in messages" :key="i" class="msg" :class="m.role">
-        <div class="bubble" :class="m.role">{{ m.content }}</div>
+        <div class="bubble" :class="m.role" v-html="renderMd(m.content)"></div>
       </div>
       <div v-if="streaming" class="msg assistant">
-        <div class="bubble assistant"><span class="cursor">▍</span>{{ streamingText }}</div>
+        <div class="bubble assistant"><span class="cursor">▍</span><span v-html="renderMd(streamingText)"></span></div>
       </div>
     </div>
 
@@ -41,8 +41,12 @@
 <script setup>
 import { ref, nextTick, onMounted } from 'vue'
 import { showToast } from 'vant'
+import { marked } from 'marked'
 import { getToken } from '../utils/auth'
 import { agentHistory, clearAgentHistory } from '../api'
+
+// Markdown 渲染：**加粗**、换行、列表、标题
+const renderMd = (text) => marked.parse(text || '')
 
 const scenarios = [
   { value: 'user_assistant', text: '用户充电助手', icon: '⚡', hint: '「附近哪里有空闲的快充？」' },
@@ -160,6 +164,13 @@ onMounted(loadHistory)
 .bubble.assistant { background: #fff; color: #2A3240; border: 1px solid #EEF1F6; border-bottom-left-radius: 4px; }
 .cursor { color: #3EC9C0; animation: blink 1s step-end infinite; }
 @keyframes blink { 50% { opacity: 0; } }
+.bubble :deep(p) { margin: 0 0 6px; }
+.bubble :deep(p:last-child) { margin-bottom: 0; }
+.bubble :deep(strong) { font-weight: 700; }
+.bubble :deep(ul), .bubble :deep(ol) { margin: 4px 0; padding-left: 1.2em; }
+.bubble :deep(li) { margin: 2px 0; }
+.bubble :deep(h1), .bubble :deep(h2), .bubble :deep(h3), .bubble :deep(h4) { font-size: 15px; font-weight: 700; margin: 6px 0; }
+.bubble :deep(code) { background: #F4F7FB; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
 .input-bar { display: flex; align-items: flex-end; gap: 10px; padding: 10px 14px; background: #fff; border-top: 1px solid #EEF1F6; }
 .input-text { flex: 1; resize: none; border: 1px solid #E6EBF2; border-radius: 20px; padding: 10px 16px; font-size: 14px; line-height: 1.4; max-height: 100px; outline: none; font-family: inherit; }
 .send-btn { background: linear-gradient(90deg, #5EA8FF, #3EC9C0); color: #fff; border: none; border-radius: 20px; padding: 10px 18px; font-size: 14px; font-weight: 600; cursor: pointer; }

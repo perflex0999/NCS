@@ -17,10 +17,10 @@
         <div class="welcome-sub">试试问：{{ currentScenario.hint }}</div>
       </div>
       <div v-for="(m, i) in messages" :key="i" class="msg" :class="m.role">
-        <div class="bubble" :class="m.role">{{ m.content }}</div>
+        <div class="bubble" :class="m.role" v-html="renderMd(m.content)"></div>
       </div>
       <div v-if="streaming" class="msg assistant">
-        <div class="bubble assistant"><span class="cursor">▍</span>{{ streamingText }}</div>
+        <div class="bubble assistant"><span class="cursor">▍</span><span v-html="renderMd(streamingText)"></span></div>
       </div>
     </div>
 
@@ -36,8 +36,11 @@
 <script setup>
 import { ref, nextTick, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { marked } from 'marked'
 import { getToken } from '../utils/auth'
 import { agentHistory, clearAgentHistory } from '../api'
+
+const renderMd = (text) => marked.parse(text || '')
 
 const scenarios = [
   { value: 'ops_assistant', text: 'AI 运营助手', icon: '📊', hint: '「今天哪个充电站订单最多？」' },
@@ -154,6 +157,15 @@ onMounted(loadHistory)
 .bubble.assistant { background: var(--panel-solid); color: var(--text-main); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
 .cursor { color: var(--cyan); animation: blink 1s step-end infinite; }
 @keyframes blink { 50% { opacity: 0; } }
+.bubble :deep(p) { margin: 0 0 6px; }
+.bubble :deep(p:last-child) { margin-bottom: 0; }
+.bubble :deep(strong) { font-weight: 700; }
+.bubble :deep(ul), .bubble :deep(ol) { margin: 4px 0; padding-left: 1.2em; }
+.bubble :deep(li) { margin: 2px 0; }
+.bubble :deep(h1), .bubble :deep(h2), .bubble :deep(h3), .bubble :deep(h4) { font-size: 15px; font-weight: 700; margin: 6px 0; }
+.bubble :deep(code) { background: rgba(15, 26, 46, 0.8); padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+.bubble :deep(table) { border-collapse: collapse; margin: 6px 0; }
+.bubble :deep(th), .bubble :deep(td) { border: 1px solid var(--border); padding: 4px 8px; font-size: 13px; }
 .input-bar { display: flex; align-items: flex-end; gap: 10px; margin-top: 12px; }
 .input-text { flex: 1; resize: none; background: rgba(15, 23, 38, 0.8); border: 1px solid var(--border); border-radius: 14px; padding: 12px 16px; font-size: 14px; line-height: 1.5; color: var(--text-main); outline: none; font-family: inherit; max-height: 120px; }
 .input-text:focus { border-color: var(--blue); }

@@ -47,11 +47,23 @@
         <van-empty v-if="!filteredStations.length" description="附近暂无充电站" />
       </div>
     </div>
+
+    <!-- AI 悬浮球 + 主动互动气泡 -->
+    <transition name="bubble-fade">
+      <div v-if="showBubble" class="ai-bubble" @click="goAssistant">
+        <span class="ai-bubble-text">{{ bubbleText }}</span>
+        <span class="ai-bubble-close" @click.stop="dismissBubble">×</span>
+      </div>
+    </transition>
+    <div class="ai-ball" @click="goAssistant">
+      <span class="ai-ball-ico">🤖</span>
+      <span class="ai-ball-pulse"></span>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { nearbyStations } from '../api'
 
@@ -150,6 +162,33 @@ const onTouchMove = (e) => {
   sheetHeight.value = Math.max(120, Math.min(maxH, startH + dy))
 }
 const onTouchEnd = () => { dragging = false }
+
+// AI 悬浮球 + 定期主动互动
+const showBubble = ref(false)
+const bubbleText = ref('')
+const greetings = [
+  '附近有空闲快充哦，需要我帮你找吗？⚡',
+  '充电费用有疑问？点我问 AI～',
+  '充电桩出问题了？我帮你诊断一下 🔧'
+]
+let bubbleTimer = null
+let bubbleHideTimer = null
+const goAssistant = () => router.push('/assistant')
+const dismissBubble = () => { showBubble.value = false }
+const showGreeting = () => {
+  bubbleText.value = greetings[Math.floor(Math.random() * greetings.length)]
+  showBubble.value = true
+  if (bubbleHideTimer) clearTimeout(bubbleHideTimer)
+  bubbleHideTimer = setTimeout(() => { showBubble.value = false }, 8000)
+}
+onMounted(() => {
+  setTimeout(showGreeting, 5000)
+  bubbleTimer = setInterval(showGreeting, 30000)
+})
+onUnmounted(() => {
+  if (bubbleTimer) clearInterval(bubbleTimer)
+  if (bubbleHideTimer) clearTimeout(bubbleHideTimer)
+})
 </script>
 
 <style scoped>
@@ -209,4 +248,32 @@ const onTouchEnd = () => { dragging = false }
   color: #fff; border: none; border-radius: 18px;
   padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
 }
+.ai-ball {
+  position: fixed; right: 16px; bottom: 96px; z-index: 50;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: linear-gradient(135deg, #5EA8FF, #3EC9C0, #45D094);
+  box-shadow: 0 6px 20px rgba(62, 201, 192, 0.4);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.ai-ball-ico { font-size: 26px; }
+.ai-ball-pulse {
+  position: absolute; inset: -4px; border-radius: 50%;
+  border: 2px solid rgba(62, 201, 192, 0.4);
+  animation: ai-pulse 2s ease-out infinite;
+}
+@keyframes ai-pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+.ai-bubble {
+  position: fixed; right: 16px; bottom: 158px; z-index: 50;
+  max-width: 220px; background: #fff; border-radius: 14px;
+  padding: 12px 14px; box-shadow: 0 6px 20px rgba(40, 60, 90, 0.18);
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.ai-bubble-text { font-size: 13px; color: #2A3240; line-height: 1.5; }
+.ai-bubble-close { color: #B0B7C3; font-size: 16px; cursor: pointer; line-height: 1; }
+.bubble-fade-enter-active, .bubble-fade-leave-active { transition: opacity 0.3s, transform 0.3s; }
+.bubble-fade-enter-from, .bubble-fade-leave-to { opacity: 0; transform: translateY(8px); }
 </style>
