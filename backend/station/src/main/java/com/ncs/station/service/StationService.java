@@ -51,8 +51,8 @@ public class StationService {
     /**
      * 查询附近充电站：先查 Redis 缓存，未命中则批量查询（消除 N+1）后回填缓存
      */
-    public List<StationVO> nearby(BigDecimal lat, BigDecimal lng, Integer deviceType, String sortBy) {
-        String key = "ncs:nearby:" + (deviceType == null ? "all" : deviceType) + ":" + sortBy;
+    public List<StationVO> nearby(BigDecimal lat, BigDecimal lng, Integer deviceType, String sortBy, Integer limit) {
+        String key = "ncs:nearby:" + (deviceType == null ? "all" : deviceType) + ":" + sortBy + ":" + limit;
         List<StationVO> cached = readCache(key);
         if (cached != null) {
             return cached;
@@ -64,7 +64,7 @@ public class StationService {
             if (cached != null) {
                 return cached;
             }
-            List<StationVO> result = computeNearby(lat, lng, deviceType, sortBy);
+            List<StationVO> result = computeNearby(lat, lng, deviceType, sortBy, limit);
             writeCache(key, result, Duration.ofSeconds(60));
             return result;
         }
@@ -91,7 +91,7 @@ public class StationService {
         }
     }
 
-    private List<StationVO> computeNearby(BigDecimal lat, BigDecimal lng, Integer deviceType, String sortBy) {
+    private List<StationVO> computeNearby(BigDecimal lat, BigDecimal lng, Integer deviceType, String sortBy, Integer limit) {
         List<Station> stations = stationMapper.selectList(
                 new LambdaQueryWrapper<Station>().eq(Station::getStatus, Station.STATUS_OPEN));
 
@@ -162,7 +162,8 @@ public class StationService {
         } else {
             result.sort(Comparator.comparing(v -> v.getDistanceKm() == null ? BigDecimal.ZERO : v.getDistanceKm()));
         }
-        return result;
+        int n = limit == null ? 100 : limit;
+        return result.size() > n ? result.subList(0, n) : result;
     }
 
     public StationDetailVO detail(Long stationId) {

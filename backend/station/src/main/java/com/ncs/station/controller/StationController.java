@@ -27,8 +27,9 @@ public class StationController {
     public Result<List<StationVO>> nearby(@RequestParam(required = false) BigDecimal lat,
                                           @RequestParam(required = false) BigDecimal lng,
                                           @RequestParam(required = false) Integer deviceType,
-                                          @RequestParam(required = false, defaultValue = "distance") String sortBy) {
-        return Result.ok(stationService.nearby(lat, lng, deviceType, sortBy));
+                                          @RequestParam(required = false, defaultValue = "distance") String sortBy,
+                                          @RequestParam(required = false, defaultValue = "100") Integer limit) {
+        return Result.ok(stationService.nearby(lat, lng, deviceType, sortBy, limit));
     }
 
     @GetMapping("/{id}")
