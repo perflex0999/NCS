@@ -38,14 +38,17 @@ public class ChargeService {
     private final OrderMapper orderMapper;
     private final StationMapper stationMapper;
     private final BillingClient billingClient;
+    private final ReserveService reserveService;
 
     public ChargeService(RedisLock redisLock, DeviceMapper deviceMapper, OrderMapper orderMapper,
-                         StationMapper stationMapper, BillingClient billingClient) {
+                         StationMapper stationMapper, BillingClient billingClient,
+                         ReserveService reserveService) {
         this.redisLock = redisLock;
         this.deviceMapper = deviceMapper;
         this.orderMapper = orderMapper;
         this.stationMapper = stationMapper;
         this.billingClient = billingClient;
+        this.reserveService = reserveService;
     }
 
     public StartChargeResponse start(Long userId, StartChargeRequest req) {
@@ -54,6 +57,9 @@ public class ChargeService {
         if (device == null) {
             throw new BizException("设备不存在");
         }
+
+        // 预约校验：检查是否被锁(24h) / 桩是否被他人预约
+        reserveService.checkAndUse(userId, req.getDeviceNo());
 
         String lockKey = RedisKeys.DEVICE_LOCK_PREFIX + req.getDeviceNo();
         String lockValue = UUID.randomUUID().toString();

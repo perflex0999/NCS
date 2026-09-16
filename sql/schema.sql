@@ -94,6 +94,19 @@ CREATE TABLE IF NOT EXISTS t_device_data (
     KEY idx_time (report_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='设备上报原始数据表';
 
+-- 充电桩预约表
+CREATE TABLE IF NOT EXISTS t_reservation (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    device_no VARCHAR(50) NOT NULL COMMENT '设备编号',
+    user_id BIGINT NOT NULL COMMENT '预约用户',
+    reserve_time DATETIME NOT NULL COMMENT '预约时间',
+    expire_time DATETIME NOT NULL COMMENT '预约截止时间(30分钟)',
+    status TINYINT NOT NULL DEFAULT 0 COMMENT '0预约中 1已使用 2已取消',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_device (device_no),
+    KEY idx_user (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='充电桩预约表';
+
 -- 故障表
 CREATE TABLE IF NOT EXISTS t_fault (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,

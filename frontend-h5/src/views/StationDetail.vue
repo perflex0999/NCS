@@ -24,10 +24,13 @@
             <img v-if="d.qrCode" :src="d.qrCode" class="qr-img" alt="扫码充电" />
             <div class="qr-hint">扫码充电</div>
           </div>
-          <van-button v-if="d.status === 0" round block class="ncs-gradient-btn charge-btn" @click="goStart(d.deviceNo)">
-            立即充电
+          <van-button v-if="d.status === 0 && !reserved.has(d.deviceNo)" round block class="ncs-gradient-btn charge-btn" @click="reserve(d.deviceNo)">
+            预约
           </van-button>
-          <van-button v-else round block disabled class="charge-btn">暂不可用</van-button>
+          <van-button v-if="d.status === 0 && reserved.has(d.deviceNo)" round block class="charge-btn reserved-btn" @click="goCharge(d.deviceNo)">
+            已预约 · 去充电
+          </van-button>
+          <van-button v-if="d.status !== 0" round block disabled class="charge-btn">暂不可用</van-button>
         </div>
       </div>
 
@@ -47,14 +50,26 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { showToast } from 'vant'
 import QRCode from 'qrcode'
-import { stationDetail } from '../api'
+import { stationDetail, reserveDevice } from '../api'
 
 const route = useRoute()
 const router = useRouter()
 const detail = ref(null)
+const reserved = ref(new Set())
 
-const goStart = (deviceNo) => router.push(`/scan?deviceNo=${deviceNo}`)
+const reserve = async (deviceNo) => {
+  try {
+    await reserveDevice(deviceNo)
+    reserved.value = new Set([...reserved.value, deviceNo])
+    showToast('预约成功，30 分钟内有效')
+  } catch (e) {
+    // 已由拦截器提示
+  }
+}
+
+const goCharge = (deviceNo) => router.push(`/scan?deviceNo=${deviceNo}`)
 
 const statusClass = (s) => ({ 0: 'ok', 1: 'busy', 2: 'err', 3: 'err', 4: 'busy' }[s] || '')
 
@@ -92,6 +107,7 @@ onMounted(async () => {
 .qr-img { width: 90px; height: 90px; border: 1px solid #EEF1F6; border-radius: 10px; padding: 4px; }
 .qr-hint { font-size: 11px; color: #B0B7C3; }
 .charge-btn { height: 42px; font-size: 15px; }
+.reserved-btn { background: #F0F6FF; color: #5EA8FF; border: 1px solid #BBD7FF; }
 .price-card { margin: 0 16px; padding: 8px 16px; }
 .price-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F4F7FB; font-size: 13px; }
 .price-row:last-child { border-bottom: none; }

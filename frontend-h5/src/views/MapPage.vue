@@ -90,15 +90,31 @@ function loadTMap() {
   })
 }
 
+// 获取定位：优先浏览器定位，失败回退到杭州默认坐标
+function getLocation() {
+  return new Promise((resolve) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => resolve({ lat: 30.2741, lng: 120.1551 }),
+        { timeout: 5000 }
+      )
+    } else {
+      resolve({ lat: 30.2741, lng: 120.1551 })
+    }
+  })
+}
+
 onMounted(async () => {
+  const loc = await getLocation()
   const TMap = await loadTMap()
   if (TMap) {
     map = new TMap.Map(document.getElementById('tmap'), {
-      center: new TMap.LatLng(30.2741, 120.1551),
+      center: new TMap.LatLng(loc.lat, loc.lng),
       zoom: 13
     })
   }
-  stations.value = await nearbyStations({ lat: 30.2741, lng: 120.1551 })
+  stations.value = await nearbyStations({ lat: loc.lat, lng: loc.lng })
   if (map && TMap) {
     markerLayer = new TMap.MultiMarker({
       map,

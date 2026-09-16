@@ -43,8 +43,12 @@ const formatTime = (s) => {
 
 const end = async () => {
   try {
-    await endCharge()
-    showToast('充电结束')
+    const order = await endCharge()
+    // 从钱包余额扣款
+    const amount = Number(order.amount || 0)
+    const balance = Number(localStorage.getItem('ncs_balance') || 100)
+    localStorage.setItem('ncs_balance', Math.max(0, balance - amount).toFixed(2))
+    showToast(`充电结束，扣款 ¥${amount.toFixed(2)}`)
     router.replace('/orders')
   } catch (e) {
     // 已由拦截器提示
