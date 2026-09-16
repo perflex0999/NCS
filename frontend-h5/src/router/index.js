@@ -1,13 +1,21 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { getToken } from '../utils/auth'
+import MainLayout from '../views/MainLayout.vue'
 
 const routes = [
-  { path: '/', redirect: '/stations' },
+  { path: '/', redirect: '/home' },
   { path: '/login', name: 'Login', component: () => import('../views/Login.vue') },
-  { path: '/stations', name: 'StationList', component: () => import('../views/StationList.vue') },
+  {
+    path: '/',
+    component: MainLayout,
+    children: [
+      { path: 'home', name: 'MapPage', component: () => import('../views/MapPage.vue') },
+      { path: 'profile', name: 'ProfilePage', component: () => import('../views/ProfilePage.vue') }
+    ]
+  },
+  { path: '/scan', name: 'ScanPage', component: () => import('../views/ScanPage.vue') },
   { path: '/station/:id', name: 'StationDetail', component: () => import('../views/StationDetail.vue') },
-  { path: '/start', name: 'StartCharge', component: () => import('../views/StartCharge.vue') },
-  { path: '/charging', name: 'Charging', component: () => import('../views/Charging.vue') },
+  { path: '/charge', name: 'Charging', component: () => import('../views/Charging.vue') },
   { path: '/orders', name: 'OrderList', component: () => import('../views/OrderList.vue') }
 ]
 

@@ -1,60 +1,68 @@
 /* ============================================================
-   NCS 深色科技主题（H5）—— 深蓝底 + 蓝青双色 + 玻璃拟态
+   NCS 用户端浅色主题（柔和能量环 / Soft-glow）—— 参考 QT 用户端
+   白底 + 蓝绿渐变(#5EA8FF → #3EC9C0 → #45D094) + 大圆角卡片
    ============================================================ */
 :root {
-  --bg-deep: #040A16;
-  --bg-mid: #0A1428;
-  --panel: rgba(15, 26, 46, 0.55);
-  --panel-solid: #0D172A;
-  --border: rgba(99, 179, 255, 0.16);
-  --border-strong: rgba(0, 229, 255, 0.35);
-  --blue: #4D9FFF;
-  --cyan: #00E5FF;
-  --green: #2DD4A7;
-  --amber: #F5B544;
-  --red: #FF4D6A;
-  --text-main: #EAF0FA;
-  --text-sub: #7E8AA0;
-  --glow-blue: rgba(77, 159, 255, 0.45);
-  --glow-cyan: rgba(0, 229, 255, 0.35);
+  /* 品牌蓝绿渐变 */
+  --brand-blue: #5EA8FF;
+  --brand-teal: #3EC9C0;
+  --brand-green: #45D094;
+  --brand-gradient: linear-gradient(90deg, #5EA8FF 0%, #3EC9C0 55%, #45D094 100%);
 
-  /* Vant 深色主题覆盖 */
-  --van-primary-color: #4D9FFF;
-  --van-success-color: #2DD4A7;
+  /* 设计变量 */
+  --bg: #F4F7FB;
+  --card: #FDFEFF;
+  --text: #2A3240;
+  --text-sub: #8B93A1;
+  --border: #EEF1F6;
+  --danger: #F06A6A;
+
+  /* Vant 浅色主题覆盖 */
+  --van-primary-color: #5EA8FF;
+  --van-success-color: #45D094;
   --van-warning-color: #F5B544;
-  --van-danger-color: #FF4D6A;
-  --van-background: #040A16;
-  --van-background-2: #0D172A;
-  --van-text-color: #EAF0FA;
-  --van-text-color-2: #7E8AA0;
-  --van-text-color-3: #55617A;
-  --van-border-color: rgba(99, 179, 255, 0.16);
-  --van-radius-lg: 14px;
-  --van-radius-md: 10px;
-  --van-nav-bar-background: rgba(13, 23, 42, 0.8);
-  --van-nav-bar-title-text-color: #EAF0FA;
-  --van-nav-bar-icon-color: #EAF0FA;
-  --van-nav-bar-text-color: #4D9FFF;
+  --van-danger-color: #F06A6A;
+  --van-background: #F4F7FB;
+  --van-background-2: #FFFFFF;
+  --van-text-color: #2A3240;
+  --van-text-color-2: #8B93A1;
+  --van-text-color-3: #B0B7C3;
+  --van-border-color: #EEF1F6;
+  --van-radius-lg: 20px;
+  --van-radius-md: 14px;
+  --van-nav-bar-background: rgba(255, 255, 255, 0.9);
+  --van-nav-bar-title-text-color: #2A3240;
+  --van-nav-bar-icon-color: #2A3240;
+  --van-nav-bar-text-color: #5EA8FF;
+  --van-tabbar-background: #FFFFFF;
+  --van-tabbar-item-active-color: #5EA8FF;
+  --van-tabbar-item-text-color: #8B93A1;
 }
 
 html, body {
-  color: var(--text-main);
+  color: var(--text);
   font-family: "SF Pro Display", "PingFang SC", "Microsoft YaHei", sans-serif;
   -webkit-font-smoothing: antialiased;
-  background:
-    radial-gradient(ellipse 70% 50% at 20% -10%, rgba(0, 229, 255, 0.12) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 40% at 90% 105%, rgba(77, 159, 255, 0.14) 0%, transparent 55%),
-    linear-gradient(180deg, #040A16 0%, #081120 55%, #050C18 100%);
+  background: linear-gradient(180deg, #EDF3F9 0%, #F4F7FB 55%, #F8FAFC 100%);
 }
 
-/* 玻璃拟态卡片 */
-.ncs-panel {
-  background: var(--panel);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+/* 白卡片（大圆角） */
+.ncs-card {
+  background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(40, 60, 90, 0.05);
+  padding: 16px;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
+}
+.ncs-card:active { transform: scale(0.985); }
+
+/* 蓝绿渐变按钮 */
+.ncs-gradient-btn {
+  background: var(--brand-gradient) !important;
+  color: #fff !important;
+  border: none !important;
+  font-weight: bold !important;
 }
 
 /* 入场动画 */
