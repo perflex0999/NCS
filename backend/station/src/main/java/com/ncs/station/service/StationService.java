@@ -148,6 +148,27 @@ public class StationService {
     }
 
     public StationDetailVO detail(Long stationId) {
+        String key = "ncs:station:detail:" + stationId;
+        try {
+            String cached = redisTemplate.opsForValue().get(key);
+            if (cached != null) {
+                return objectMapper.readValue(cached, StationDetailVO.class);
+            }
+        } catch (Exception e) {
+            // 缓存异常则忽略，走数据库
+        }
+
+        StationDetailVO vo = computeDetail(stationId);
+
+        try {
+            redisTemplate.opsForValue().set(key, objectMapper.writeValueAsString(vo), Duration.ofSeconds(10));
+        } catch (Exception e) {
+            // 缓存写入失败忽略
+        }
+        return vo;
+    }
+
+    private StationDetailVO computeDetail(Long stationId) {
         Station s = stationMapper.selectById(stationId);
         if (s == null) {
             throw new BizException("充电站不存在");
