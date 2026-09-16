@@ -5,10 +5,10 @@
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import * as echarts from 'echarts'
-import beijingGeo from '../data/beijing.json'
+import hangzhouGeo from '../data/hangzhou.json'
 
-// 充电站地图分布：北京行政区划 GeoJSON 底图(真实区界) + 涟漪散点标点。
-// 三站分别落在 朝阳(望京)/海淀(中关村)/大兴(亦庄)。
+// 充电站地图分布：杭州行政区划 GeoJSON 底图(真实区界) + 涟漪散点标点。
+// 平台充电站数据为杭州坐标，底图用杭州区划以匹配真实数据。
 const props = defineProps({
   stations: { type: Array, default: () => [] }
 })
@@ -64,7 +64,7 @@ function buildOption() {
       formatter: detailFormatter
     },
     geo: {
-      map: 'beijing',
+      map: 'hangzhou',
       roam: true,
       zoom: 1.05,
       layoutCenter: ['50%', '50%'],
@@ -125,7 +125,7 @@ onMounted(async () => {
   await nextTick()
   chart = echarts.init(el.value)
   if (!geoRegistered) {
-    echarts.registerMap('beijing', beijingGeo)
+    echarts.registerMap('hangzhou', hangzhouGeo)
     geoRegistered = true
   }
   window.addEventListener('resize', resize)
