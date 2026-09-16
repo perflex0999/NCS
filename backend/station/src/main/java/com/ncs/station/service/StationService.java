@@ -1,6 +1,8 @@
 package com.ncs.station.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ncs.common.exception.BizException;
 import com.ncs.station.dto.DeviceVO;
 import com.ncs.station.dto.PriceVO;
@@ -13,14 +15,19 @@ import com.ncs.station.mapper.DeviceMapper;
 import com.ncs.station.mapper.PriceMapper;
 import com.ncs.station.mapper.StationMapper;
 import com.ncs.station.util.GeoUtil;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class StationService {
@@ -28,20 +35,61 @@ public class StationService {
     private final StationMapper stationMapper;
     private final DeviceMapper deviceMapper;
     private final PriceMapper priceMapper;
+    private final StringRedisTemplate redisTemplate;
+    private final ObjectMapper objectMapper;
 
-    public StationService(StationMapper stationMapper, DeviceMapper deviceMapper, PriceMapper priceMapper) {
+    public StationService(StationMapper stationMapper, DeviceMapper deviceMapper,
+                          PriceMapper priceMapper, StringRedisTemplate redisTemplate,
+                          ObjectMapper objectMapper) {
         this.stationMapper = stationMapper;
         this.deviceMapper = deviceMapper;
         this.priceMapper = priceMapper;
+        this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
     }
 
+    /**
+     * 查询附近充电站：先查 Redis 缓存，未命中则批量查询（消除 N+1）后回填缓存
+     */
     public List<StationVO> nearby(BigDecimal lat, BigDecimal lng, Integer deviceType, String sortBy) {
+        String key = "ncs:nearby:" + (deviceType == null ? "all" : deviceType) + ":" + sortBy;
+        try {
+            String cached = redisTemplate.opsForValue().get(key);
+            if (cached != null) {
+                return objectMapper.readValue(cached, new TypeReference<List<StationVO>>() {
+                });
+            }
+        } catch (Exception e) {
+            // 缓存异常则忽略，走数据库
+        }
+
+        List<StationVO> result = computeNearby(lat, lng, deviceType, sortBy);
+
+        try {
+            redisTemplate.opsForValue().set(key, objectMapper.writeValueAsString(result), Duration.ofSeconds(5));
+        } catch (Exception e) {
+            // 缓存写入失败忽略
+        }
+        return result;
+    }
+
+    private List<StationVO> computeNearby(BigDecimal lat, BigDecimal lng, Integer deviceType, String sortBy) {
         List<Station> stations = stationMapper.selectList(
                 new LambdaQueryWrapper<Station>().eq(Station::getStatus, Station.STATUS_OPEN));
+
+        // 批量查询所有设备 + 价格（各 1 条 SQL），内存里按站分组，消除 N+1
+        List<Device> allDevices = deviceMapper.selectList(null);
+        Map<Long, List<Device>> devicesByStation = allDevices.stream()
+                .collect(Collectors.groupingBy(Device::getStationId));
+
+        List<Price> allPrices = priceMapper.selectList(null);
+        Map<String, List<Price>> pricesByKey = allPrices.stream()
+                .collect(Collectors.groupingBy(p -> p.getStationId() + ":" + p.getDeviceType()));
+
+        LocalTime now = LocalTime.now();
         List<StationVO> result = new ArrayList<>();
         for (Station s : stations) {
-            List<Device> devices = deviceMapper.selectList(
-                    new LambdaQueryWrapper<Device>().eq(Device::getStationId, s.getId()));
+            List<Device> devices = devicesByStation.getOrDefault(s.getId(), List.of());
             int fastCount = 0;
             int slowCount = 0;
             int idleCount = 0;
@@ -66,7 +114,7 @@ public class StationService {
 
             int typeForPrice = (deviceType != null) ? deviceType
                     : (fastCount > 0 ? Device.TYPE_FAST : Device.TYPE_SLOW);
-            Price price = getCurrentPrice(s.getId(), typeForPrice);
+            Price price = pickCurrentPrice(pricesByKey.get(s.getId() + ":" + typeForPrice), now);
 
             StationVO vo = new StationVO();
             vo.setStationId(s.getId());
@@ -125,14 +173,10 @@ public class StationService {
         return vo;
     }
 
-    private Price getCurrentPrice(Long stationId, Integer deviceType) {
-        List<Price> prices = priceMapper.selectList(new LambdaQueryWrapper<Price>()
-                .eq(Price::getStationId, stationId)
-                .eq(Price::getDeviceType, deviceType));
-        if (prices.isEmpty()) {
+    private Price pickCurrentPrice(List<Price> prices, LocalTime now) {
+        if (prices == null || prices.isEmpty()) {
             return null;
         }
-        LocalTime now = LocalTime.now();
         for (Price p : prices) {
             if (inPeriod(now, p.getStartTime(), p.getEndTime())) {
                 return p;

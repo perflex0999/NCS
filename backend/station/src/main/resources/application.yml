@@ -19,6 +19,11 @@ spring:
     url: jdbc:mysql://localhost:3306/ncs?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
     username: root
     password: ${DB_PASSWORD:}
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD:}
 
 mybatis-plus:
   configuration:
