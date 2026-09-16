@@ -29,7 +29,7 @@ const load = async () => {
     status.value = await currentCharge()
   } catch (e) {
     clearInterval(timer)
-    router.replace('/stations')
+    router.replace('/home')
   }
 }
 

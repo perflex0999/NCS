@@ -17,7 +17,10 @@
     <el-container class="main">
       <el-header class="header">
         <span class="title">{{ $route.meta.title }}</span>
-        <el-button link type="primary" @click="logout">退出登录</el-button>
+        <div class="header-actions">
+          <el-button link type="primary" @click="$router.push('/bigscreen')">📺 数据大屏</el-button>
+          <el-button link type="primary" @click="logout">退出登录</el-button>
+        </div>
       </el-header>
       <el-main class="content">
         <router-view v-slot="{ Component }">
@@ -79,5 +82,6 @@ const logout = () => {
   position: sticky; top: 0; z-index: 10;
 }
 .title { font-size: 18px; font-weight: 600; color: var(--text-main); }
+.header-actions { display: flex; align-items: center; gap: 8px; }
 .content { padding: 24px; }
 </style>

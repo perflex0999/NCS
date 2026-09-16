@@ -12,11 +12,12 @@
       </div>
     </div>
 
-    <!-- 余额卡片（蓝绿渐变） -->
+    <!-- 余额卡片（蓝绿渐变，可充值） -->
     <div class="balance ncs-enter" style="animation-delay:80ms">
-      <div class="balance-label">账户余额</div>
-      <div class="balance-value">¥ 100.00</div>
+      <div class="balance-label">账户余额（元）</div>
+      <div class="balance-value">¥ {{ balance.toFixed(2) }}</div>
       <div class="balance-sub">赠送积分 200</div>
+      <button class="recharge-btn" @click="$router.push('/recharge')">充值</button>
     </div>
 
     <!-- 功能入口 -->
@@ -40,7 +41,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { clearToken } from '../utils/auth'
@@ -48,6 +49,11 @@ import { clearToken } from '../utils/auth'
 const router = useRouter()
 const nickname = ref('')
 const phone = ref('')
+const balance = ref(100)
+
+onMounted(() => {
+  balance.value = Number(localStorage.getItem('ncs_balance') || 100)
+})
 
 const logout = () => {
   clearToken()
@@ -73,6 +79,7 @@ const logout = () => {
 .nickname { font-size: 17px; font-weight: 600; color: #2A3240; }
 .phone { font-size: 13px; color: #8B93A1; margin-top: 4px; }
 .balance {
+  position: relative;
   border-radius: 20px; padding: 22px; color: #fff;
   background: linear-gradient(135deg, #5EA8FF, #3EC9C0 60%, #45D094);
   box-shadow: 0 10px 26px rgba(62, 201, 192, 0.28);
@@ -80,6 +87,11 @@ const logout = () => {
 .balance-label { font-size: 13px; opacity: 0.9; }
 .balance-value { font-size: 34px; font-weight: 700; margin-top: 6px; }
 .balance-sub { font-size: 12px; opacity: 0.85; margin-top: 6px; }
+.recharge-btn {
+  position: absolute; top: 16px; right: 16px;
+  background: rgba(255,255,255,0.25); color: #fff; border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 16px; padding: 5px 14px; font-size: 13px; cursor: pointer;
+}
 .entries { padding: 6px 16px; }
 .entry {
   display: flex; align-items: center; gap: 12px;

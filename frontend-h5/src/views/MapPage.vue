@@ -17,8 +17,9 @@
         :class="{ active: deviceType === c.value }" @click="selectCategory(c.value)">{{ c.text }}</div>
     </div>
 
-    <!-- 底部充电站抽屉 -->
-    <div class="sheet">
+    <!-- 底部充电站抽屉（可上拉下拉） -->
+    <div class="sheet" :style="{ height: sheetHeight + 'px' }"
+      @touchstart="onTouchStart" @touchmove="onTouchMove" @touchend="onTouchEnd">
       <div class="sheet-grabber"></div>
       <div class="sheet-header">
         <span class="sheet-title">附近充电站</span>
@@ -115,6 +116,24 @@ onMounted(async () => {
 })
 
 const goDetail = (s) => router.push(`/station/${s.stationId}`)
+
+// 抽屉拖拽（上拉放大、下拉缩小）
+const sheetHeight = ref(300)
+let dragging = false
+let startY = 0
+let startH = 0
+const onTouchStart = (e) => {
+  dragging = true
+  startY = e.touches[0].clientY
+  startH = sheetHeight.value
+}
+const onTouchMove = (e) => {
+  if (!dragging) return
+  const dy = startY - e.touches[0].clientY
+  const maxH = window.innerHeight * 0.62
+  sheetHeight.value = Math.max(220, Math.min(maxH, startH + dy))
+}
+const onTouchEnd = () => { dragging = false }
 </script>
 
 <style scoped>
@@ -146,9 +165,10 @@ const goDetail = (s) => router.push(`/station/${s.stationId}`)
 .sheet {
   position: absolute; bottom: 0; left: 0; right: 0; z-index: 10;
   background: #fff; border-radius: 22px 22px 0 0;
-  padding: 8px 16px 16px;
+  padding: 8px 16px 20px;
   box-shadow: 0 -8px 30px rgba(40, 60, 90, 0.12);
-  max-height: 48%; display: flex; flex-direction: column;
+  display: flex; flex-direction: column;
+  transition: height 0.1s linear;
 }
 .sheet-grabber { width: 40px; height: 4px; border-radius: 2px; background: #E6EBF2; margin: 4px auto 8px; }
 .sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 4px 4px 10px; }

@@ -4,6 +4,7 @@ import Layout from '../views/Layout.vue'
 
 const routes = [
   { path: '/login', name: 'Login', component: () => import('../views/Login.vue') },
+  { path: '/bigscreen', name: 'BigScreen', component: () => import('../views/BigScreen.vue') },
   {
     path: '/',
     component: Layout,
