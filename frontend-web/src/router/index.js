@@ -15,7 +15,8 @@ const routes = [
       { path: 'devices', name: 'DeviceManage', component: () => import('../views/DeviceManage.vue'), meta: { title: '充电桩管理' } },
       { path: 'orders', name: 'OrderManage', component: () => import('../views/OrderManage.vue'), meta: { title: '订单管理' } },
       { path: 'prices', name: 'PriceManage', component: () => import('../views/PriceManage.vue'), meta: { title: '价格管理' } },
-      { path: 'faults', name: 'FaultManage', component: () => import('../views/FaultManage.vue'), meta: { title: '故障管理' } }
+      { path: 'faults', name: 'FaultManage', component: () => import('../views/FaultManage.vue'), meta: { title: '故障管理' } },
+      { path: 'assistant', name: 'Assistant', component: () => import('../views/Assistant.vue'), meta: { title: 'AI 智能助手' } }
     ]
   }
 ]

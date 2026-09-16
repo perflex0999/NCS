@@ -25,6 +25,9 @@
       <div class="entry" @click="$router.push('/orders')">
         <span class="entry-ico">🧾</span><span>我的订单</span><span class="arrow">›</span>
       </div>
+      <div class="entry" @click="$router.push('/assistant')">
+        <span class="entry-ico">🤖</span><span>AI 智能助手</span><span class="arrow">›</span>
+      </div>
       <div class="entry" @click="$router.push('/scan')">
         <span class="entry-ico">⚡</span><span>扫码充电</span><span class="arrow">›</span>
       </div>

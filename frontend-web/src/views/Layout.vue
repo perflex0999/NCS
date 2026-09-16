@@ -12,6 +12,7 @@
         <el-menu-item index="/orders"><span class="menu-ico">🧾</span><span>订单管理</span></el-menu-item>
         <el-menu-item index="/prices"><span class="menu-ico">💰</span><span>价格管理</span></el-menu-item>
         <el-menu-item index="/faults"><span class="menu-ico">⚠️</span><span>故障管理</span></el-menu-item>
+        <el-menu-item index="/assistant"><span class="menu-ico">🤖</span><span>AI 智能助手</span></el-menu-item>
       </el-menu>
     </el-aside>
     <el-container class="main">

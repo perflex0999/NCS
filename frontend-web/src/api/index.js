@@ -32,3 +32,7 @@ export const faultDelete = (id) => request.delete(`/api/admin/fault/${id}`)
 // 统计
 export const statsOverview = () => request.get('/api/admin/stats/overview')
 export const statsTrend = (days = 7) => request.get('/api/admin/stats/trend', { params: { days } })
+
+// AI 助手
+export const agentHistory = (scenario) => request.get('/api/agent/history', { params: { scenario } })
+export const clearAgentHistory = (scenario) => request.delete('/api/agent/history', { params: { scenario } })

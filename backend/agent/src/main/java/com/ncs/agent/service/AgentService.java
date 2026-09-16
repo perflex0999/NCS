@@ -2,6 +2,8 @@ package com.ncs.agent.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ncs.agent.entity.ChatHistory;
+import com.ncs.agent.mapper.ChatHistoryMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -12,51 +14,62 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Agent 编排：LLM + Function Calling + 流式输出
+ * Agent 编排：LLM + Function Calling + 流式输出 + 历史记录
+ * 支持 4 个场景：用户充电助手 / 智能故障咨询 / AI运营助手 / AI运营报告
  */
 @Slf4j
 @Service
 public class AgentService {
 
-    private static final String SYSTEM_PROMPT = """
-            你是智能充电桩运营服务平台的 AI 智能助手。你能结合系统真实业务数据回答用户问题。
-            根据用户问题选择合适的工具查询数据，再用自然、友好的中文回答。
-            场景：
-            1. 用户充电助手：帮用户找充电站、查当前充电费用、查历史订单
-            2. 智能故障咨询：诊断充电桩故障，查设备状态/订单状态后给出建议
-            3. AI 运营助手：查运营数据（用户数、订单数、收入、故障数等）
-            4. AI 运营报告：基于统计数据生成运营分析报告
-            要求：简洁准确，只使用工具返回的真实数据，绝不编造数据。""";
+    private static final Map<String, String> SCENARIOS = new HashMap<>();
+    static {
+        SCENARIOS.put("user_assistant", """
+                你是智能充电桩运营平台的「用户充电助手」。帮用户：找附近充电站、查当前充电费用、查历史充电订单。
+                回答要简洁友好，基于工具返回的真实数据，绝不编造。""");
+        SCENARIOS.put("fault_consult", """
+                你是智能充电桩运营平台的「智能故障咨询专家」。用户在充电中遇到问题时（如桩无法启动、充电中断），
+                先查设备状态和订单状态，再给出初步诊断和处理建议；解决不了就引导用户提交故障反馈。""");
+        SCENARIOS.put("ops_assistant", """
+                你是智能充电桩运营平台的「AI 运营助手」。帮运营人员用自然语言查询运营数据：
+                用户数、订单数、总收入、设备数、故障数、充电量等。回答基于真实统计数据，条理清晰。""");
+        SCENARIOS.put("ops_report", """
+                你是智能充电桩运营平台的「AI 运营报告生成器」。根据统计数据自动生成一份运营分析报告，
+                包含：订单情况、收入情况、用户增长、设备运行情况、故障情况。用 Markdown 结构化输出。""");
+    }
 
     private final LlmClient llmClient;
     private final ToolService toolService;
+    private final ChatHistoryMapper chatHistoryMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public AgentService(LlmClient llmClient, ToolService toolService) {
+    public AgentService(LlmClient llmClient, ToolService toolService, ChatHistoryMapper chatHistoryMapper) {
         this.llmClient = llmClient;
         this.toolService = toolService;
+        this.chatHistoryMapper = chatHistoryMapper;
     }
 
-    public void chat(String userMessage, Long userId, SseEmitter emitter) {
+    public void chat(String userMessage, Long userId, String scenario, SseEmitter emitter) {
         try {
+            String systemPrompt = SCENARIOS.getOrDefault(scenario, SCENARIOS.get("user_assistant"));
             List<Map<String, Object>> messages = new ArrayList<>();
-            messages.add(msg("system", SYSTEM_PROMPT));
+            messages.add(msg("system", systemPrompt));
             messages.add(msg("user", userMessage));
 
-            // 第一次调用（非流式）：让模型决定是否调用工具
+            // 保存用户消息到历史
+            saveHistory(userId, scenario, "user", userMessage);
+
+            // 第一次调用（非流式）：判断是否调用工具
             JsonNode resp = llmClient.chat(messages, toolDefinitions());
             JsonNode message = resp.path("choices").path(0).path("message");
             JsonNode toolCalls = message.path("tool_calls");
 
             if (toolCalls.isArray() && toolCalls.size() > 0) {
-                // 追加 assistant 的 tool_calls
                 Map<String, Object> assistantMsg = new HashMap<>();
                 assistantMsg.put("role", "assistant");
                 assistantMsg.put("content", null);
                 assistantMsg.put("tool_calls", toolCalls);
                 messages.add(assistantMsg);
 
-                // 执行工具并追加结果
                 for (JsonNode tc : toolCalls) {
                     String id = tc.path("id").asText();
                     String name = tc.path("function").path("name").asText();
@@ -71,13 +84,20 @@ public class AgentService {
             }
 
             // 最终调用（流式）：生成回答并逐段推送
+            StringBuilder full = new StringBuilder();
             llmClient.streamChat(messages, chunk -> {
+                full.append(chunk);
                 try {
                     emitter.send(SseEmitter.event().data(chunk));
                 } catch (Exception ignored) {
                 }
             });
             emitter.complete();
+
+            // 保存助手回复到历史
+            if (full.length() > 0) {
+                saveHistory(userId, scenario, "assistant", full.toString());
+            }
         } catch (Exception e) {
             log.error("Agent 处理失败", e);
             try {
@@ -85,6 +105,19 @@ public class AgentService {
             } catch (Exception ignored) {
             }
             emitter.complete();
+        }
+    }
+
+    private void saveHistory(Long userId, String scenario, String role, String content) {
+        try {
+            ChatHistory h = new ChatHistory();
+            h.setUserId(userId == null ? 1L : userId);
+            h.setScenario(scenario);
+            h.setRole(role);
+            h.setContent(content);
+            chatHistoryMapper.insert(h);
+        } catch (Exception e) {
+            log.warn("保存聊天历史失败: {}", e.getMessage());
         }
     }
 

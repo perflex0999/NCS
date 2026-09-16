@@ -94,6 +94,17 @@ CREATE TABLE IF NOT EXISTS t_device_data (
     KEY idx_time (report_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='设备上报原始数据表';
 
+-- 聊天历史记录表（AI Agent）
+CREATE TABLE IF NOT EXISTS t_chat_history (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL COMMENT '用户',
+    scenario VARCHAR(50) NOT NULL COMMENT '场景',
+    role VARCHAR(20) NOT NULL COMMENT 'user/assistant',
+    content TEXT COMMENT '内容',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_user_scenario (user_id, scenario)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='AI聊天历史表';
+
 -- 充电桩预约表
 CREATE TABLE IF NOT EXISTS t_reservation (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,

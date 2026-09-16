@@ -5,6 +5,8 @@ export const nearbyStations = (params) => request.get('/api/station/nearby', { p
 export const stationDetail = (id) => request.get(`/api/station/${id}`)
 export const startCharge = (deviceNo) => request.post('/api/charge/start', { deviceNo })
 export const reserveDevice = (deviceNo) => request.post('/api/reserve', { deviceNo })
+export const agentHistory = (scenario) => request.get('/api/agent/history', { params: { scenario } })
+export const clearAgentHistory = (scenario) => request.delete('/api/agent/history', { params: { scenario } })
 export const currentCharge = () => request.get('/api/charge/current')
 export const endCharge = () => request.post('/api/charge/end')
 export const myOrders = () => request.get('/api/order/my')
