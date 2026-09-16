@@ -4,5 +4,21 @@ server:
 spring:
   application:
     name: ncs-order
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ncs?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: Ncs@123456
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: Ncs@123456
+  jackson:
+    time-zone: Asia/Shanghai
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
 
 # TODO(阶段3): 接入 Nacos 注册中心 + 配置中心
