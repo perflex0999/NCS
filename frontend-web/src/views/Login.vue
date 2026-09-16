@@ -1,17 +1,21 @@
 <template>
   <div class="login-wrap">
-    <el-card class="login-card">
-      <h2>充电运营管理后台</h2>
+    <div class="login-card ncs-enter">
+      <div class="brand">
+        <div class="brand-dot"></div>
+        <h1>充电运营管理后台</h1>
+      </div>
+      <p class="sub">智能充电桩运营服务平台</p>
       <el-form @submit.prevent>
         <el-form-item>
-          <el-input v-model="phone" placeholder="手机号" />
+          <el-input v-model="phone" placeholder="手机号" size="large" />
         </el-form-item>
         <el-form-item>
-          <el-input v-model="code" placeholder="验证码（固定 123456）" />
+          <el-input v-model="code" placeholder="验证码（固定 123456）" size="large" />
         </el-form-item>
-        <el-button type="primary" style="width: 100%" @click="onSubmit">登录</el-button>
+        <el-button type="primary" size="large" class="submit" @click="onSubmit">登录</el-button>
       </el-form>
-    </el-card>
+    </div>
   </div>
 </template>
 
@@ -44,8 +48,22 @@ const onSubmit = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f0f2f5;
+  background: linear-gradient(135deg, #f0fdf4 0%, #f5f5f7 50%, #dcfce7 100%);
 }
-.login-card { width: 360px; }
-.login-card h2 { text-align: center; margin-bottom: 20px; }
+.login-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 24px 60px rgba(0, 0, 0, 0.08);
+  padding: 40px;
+  width: 380px;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.15);
+}
+.brand h1 { font-size: 20px; margin: 0; }
+.sub { color: var(--ncs-text-2); font-size: 13px; margin: 8px 0 24px; }
+.submit { width: 100%; margin-top: 8px; }
 </style>

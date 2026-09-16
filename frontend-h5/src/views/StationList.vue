@@ -1,20 +1,31 @@
 <template>
-  <div>
+  <div class="page">
     <van-nav-bar title="附近充电站" right-text="订单" @click-right="$router.push('/orders')" />
-    <van-dropdown-menu>
-      <van-dropdown-item v-model="deviceType" :options="typeOptions" @change="load" />
-      <van-dropdown-item v-model="sortBy" :options="sortOptions" @change="load" />
-    </van-dropdown-menu>
-    <van-cell-group inset v-if="stations.length">
-      <van-cell v-for="s in stations" :key="s.stationId" :title="s.name"
-        :label="`${s.address} · 距离 ${s.distanceKm ?? '-'} km`" is-link @click="goDetail(s)">
-        <template #value>
-          <div class="price">¥{{ s.unitPrice ?? '-' }}/度</div>
-          <div class="sub">快{{ s.fastCount }} 慢{{ s.slowCount }} 空闲{{ s.idleCount }}</div>
-        </template>
-      </van-cell>
-    </van-cell-group>
-    <van-empty v-else description="暂无充电站" />
+    <div class="filters">
+      <van-dropdown-menu>
+        <van-dropdown-item v-model="deviceType" :options="typeOptions" @change="load" />
+        <van-dropdown-item v-model="sortBy" :options="sortOptions" @change="load" />
+      </van-dropdown-menu>
+    </div>
+    <div class="station-list">
+      <div v-for="(s, i) in stations" :key="s.stationId" class="ncs-card station-card ncs-enter"
+        :style="{ animationDelay: (i * 60) + 'ms' }" @click="goDetail(s)">
+        <div class="station-head">
+          <span class="station-name">{{ s.name }}</span>
+          <span class="distance">{{ s.distanceKm ?? '-' }} km</span>
+        </div>
+        <div class="station-addr">{{ s.address }} · {{ s.city }}</div>
+        <div class="station-foot">
+          <span class="price">¥{{ s.unitPrice ?? '-' }}<em>/度</em></span>
+          <div class="chips">
+            <span class="chip">快充 {{ s.fastCount }}</span>
+            <span class="chip">慢充 {{ s.slowCount }}</span>
+            <span class="chip idle">空闲 {{ s.idleCount }}</span>
+          </div>
+        </div>
+      </div>
+      <van-empty v-if="!stations.length" description="暂无充电站" />
+    </div>
   </div>
 </template>
 
@@ -38,7 +49,6 @@ const sortOptions = [
   { text: '按价格', value: 'price' }
 ]
 
-// 演示用默认定位（杭州），真实场景可用浏览器定位
 const load = async () => {
   try {
     stations.value = await nearbyStations({
@@ -58,6 +68,17 @@ onMounted(load)
 </script>
 
 <style scoped>
-.price { color: #ee0a24; font-weight: bold; }
-.sub { color: #969799; font-size: 12px; }
+.page { min-height: 100vh; background: #f5f5f7; }
+.filters { background: #fff; }
+.station-list { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+.station-head { display: flex; align-items: center; justify-content: space-between; }
+.station-name { font-size: 17px; font-weight: 600; }
+.distance { color: #6e6e73; font-size: 13px; background: #f0f0f2; padding: 3px 10px; border-radius: 999px; }
+.station-addr { color: #6e6e73; font-size: 13px; margin-top: 6px; }
+.station-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; }
+.price { color: #16a34a; font-size: 20px; font-weight: 700; }
+.price em { font-style: normal; font-size: 12px; font-weight: 400; color: #6e6e73; }
+.chips { display: flex; gap: 6px; }
+.chip { font-size: 12px; color: #1d1d1f; background: #f0f0f2; padding: 4px 10px; border-radius: 8px; }
+.chip.idle { color: #16a34a; background: #f0fdf4; }
 </style>

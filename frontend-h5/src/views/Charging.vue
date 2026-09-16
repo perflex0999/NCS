@@ -61,10 +61,11 @@ onUnmounted(() => clearInterval(timer))
 <style scoped>
 .status-card {
   margin: 16px;
-  padding: 32px 16px;
+  padding: 36px 16px;
   text-align: center;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #1989fa, #07c160);
+  border-radius: 20px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  box-shadow: 0 12px 30px rgba(34, 197, 94, 0.3);
   color: #fff;
 }
 .station { font-size: 18px; font-weight: bold; }
