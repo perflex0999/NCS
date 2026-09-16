@@ -26,3 +26,6 @@ logs/
 # 前端
 node_modules/
 dist/
+
+# 大文件/压缩包
+*.zip
