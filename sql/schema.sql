@@ -78,6 +78,22 @@ CREATE TABLE IF NOT EXISTS t_charging_order (
     KEY idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='充电订单表';
 
+-- 设备上报原始数据表（时序，供设备接入链路写入）
+CREATE TABLE IF NOT EXISTS t_device_data (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    device_no VARCHAR(50) NOT NULL COMMENT '设备编号',
+    station_id BIGINT DEFAULT NULL COMMENT '充电站',
+    voltage DECIMAL(8,2) DEFAULT NULL COMMENT '电压',
+    current DECIMAL(8,2) DEFAULT NULL COMMENT '电流',
+    power DECIMAL(8,2) DEFAULT NULL COMMENT '功率',
+    energy DECIMAL(12,2) DEFAULT NULL COMMENT '累计电量',
+    status TINYINT DEFAULT NULL COMMENT '状态',
+    report_time DATETIME DEFAULT NULL COMMENT '上报时间',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_device_time (device_no, report_time),
+    KEY idx_time (report_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='设备上报原始数据表';
+
 -- 故障表
 CREATE TABLE IF NOT EXISTS t_fault (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,

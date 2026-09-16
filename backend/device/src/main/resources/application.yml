@@ -1,19 +1,13 @@
 server:
-  port: 8081
+  port: 8088
 
 spring:
   application:
-    name: ncs-user
+    name: ncs-device
   cloud:
     nacos:
       discovery:
         server-addr: ${NACOS_ADDR:localhost:8848}
-      config:
-        server-addr: ${NACOS_ADDR:localhost:8848}
-        file-extension: yaml
-  config:
-    import:
-      - optional:nacos:ncs-user.yaml
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/ncs?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
@@ -23,3 +17,12 @@ spring:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
+
+# MQTT（EMQX）
+mqtt:
+  broker: ${MQTT_BROKER:tcp://localhost:1883}
+  topic: ${MQTT_TOPIC:device/status}
+
+# RocketMQ
+rocketmq:
+  name-server: ${ROCKETMQ_NAMESRV:localhost:9876}

@@ -28,6 +28,8 @@
         <module>fault</module>
         <module>statistics</module>
         <module>agent</module>
+        <module>device</module>
+        <module>device-simulator</module>
     </modules>
 
     <properties>
@@ -39,6 +41,8 @@
         <spring-cloud-alibaba.version>2023.0.1.0</spring-cloud-alibaba.version>
         <mybatis-plus.version>3.5.6</mybatis-plus.version>
         <jjwt.version>0.12.5</jjwt.version>
+        <paho.version>1.2.5</paho.version>
+        <rocketmq-client.version>5.1.4</rocketmq-client.version>
     </properties>
 
     <dependencyManagement>
@@ -76,6 +80,16 @@
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-jackson</artifactId>
                 <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.paho</groupId>
+                <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+                <version>${paho.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-client</artifactId>
+                <version>${rocketmq-client.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

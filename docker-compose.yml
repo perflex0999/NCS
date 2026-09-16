@@ -1,6 +1,6 @@
 # 本地开发中间件编排
 # 用法：docker compose up -d
-# 密码统一由环境变量 ROOT_PASSWORD 控制（默认 Ncs@123456），可复制 .env.example 为 .env 覆盖。
+# 密码统一由环境变量 ROOT_PASSWORD 控制，可复制 .env.example 为 .env 覆盖。
 # 若镜像拉取缓慢，请在 Docker Desktop 设置中配置国内镜像加速器。
 
 services:
@@ -9,7 +9,7 @@ services:
     container_name: ncs-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD:-Ncs@123456}
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
       TZ: Asia/Shanghai
     ports:
       - "3306:3306"
@@ -20,7 +20,7 @@ services:
       - --collation-server=utf8mb4_unicode_ci
       - --default-authentication-plugin=mysql_native_password
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${ROOT_PASSWORD:-Ncs@123456}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${ROOT_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -31,11 +31,11 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
-    command: ["redis-server", "--requirepass", "${ROOT_PASSWORD:-Ncs@123456}"]
+    command: ["redis-server", "--requirepass", "${ROOT_PASSWORD}"]
     volumes:
       - redis-data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${ROOT_PASSWORD:-Ncs@123456}", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${ROOT_PASSWORD}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 10
