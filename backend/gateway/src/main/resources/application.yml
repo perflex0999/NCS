@@ -49,6 +49,10 @@ spring:
           uri: lb://ncs-statistics
           predicates:
             - Path=/api/admin/stats/**
+        - id: agent
+          uri: lb://ncs-agent
+          predicates:
+            - Path=/api/agent/**
   config:
     import:
       - optional:nacos:ncs-gateway.yaml
