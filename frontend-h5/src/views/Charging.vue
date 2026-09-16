@@ -64,9 +64,9 @@ onUnmounted(() => clearInterval(timer))
   padding: 36px 16px;
   text-align: center;
   border-radius: 20px;
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  box-shadow: 0 12px 30px rgba(34, 197, 94, 0.3);
-  color: #fff;
+  background: linear-gradient(135deg, #4D9FFF, #00E5FF);
+  box-shadow: 0 12px 30px rgba(0, 229, 255, 0.28);
+  color: #040A16;
 }
 .station { font-size: 18px; font-weight: bold; }
 .device { font-size: 13px; opacity: 0.9; margin-top: 6px; }

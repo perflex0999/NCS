@@ -8,7 +8,7 @@
       </van-dropdown-menu>
     </div>
     <div class="station-list">
-      <div v-for="(s, i) in stations" :key="s.stationId" class="ncs-card station-card ncs-enter"
+      <div v-for="(s, i) in stations" :key="s.stationId" class="ncs-panel station-card ncs-enter"
         :style="{ animationDelay: (i * 60) + 'ms' }" @click="goDetail(s)">
         <div class="station-head">
           <span class="station-name">{{ s.name }}</span>
@@ -68,17 +68,18 @@ onMounted(load)
 </script>
 
 <style scoped>
-.page { min-height: 100vh; background: #f5f5f7; }
-.filters { background: #fff; }
+.page { min-height: 100vh; }
+.filters { background: rgba(13, 23, 42, 0.7); backdrop-filter: blur(14px); }
 .station-list { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+.station-card { padding: 16px; }
 .station-head { display: flex; align-items: center; justify-content: space-between; }
-.station-name { font-size: 17px; font-weight: 600; }
-.distance { color: #6e6e73; font-size: 13px; background: #f0f0f2; padding: 3px 10px; border-radius: 999px; }
-.station-addr { color: #6e6e73; font-size: 13px; margin-top: 6px; }
+.station-name { font-size: 17px; font-weight: 600; color: var(--text-main); }
+.distance { color: var(--text-sub); font-size: 12px; background: rgba(77, 159, 255, 0.12); color: var(--blue); padding: 3px 10px; border-radius: 999px; }
+.station-addr { color: var(--text-sub); font-size: 13px; margin-top: 6px; }
 .station-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; }
-.price { color: #16a34a; font-size: 20px; font-weight: 700; }
-.price em { font-style: normal; font-size: 12px; font-weight: 400; color: #6e6e73; }
+.price { color: var(--cyan); font-size: 20px; font-weight: 700; text-shadow: 0 0 12px var(--glow-cyan); }
+.price em { font-style: normal; font-size: 12px; font-weight: 400; color: var(--text-sub); }
 .chips { display: flex; gap: 6px; }
-.chip { font-size: 12px; color: #1d1d1f; background: #f0f0f2; padding: 4px 10px; border-radius: 8px; }
-.chip.idle { color: #16a34a; background: #f0fdf4; }
+.chip { font-size: 12px; color: var(--text-sub); background: rgba(15, 26, 46, 0.7); border: 1px solid var(--border); padding: 4px 10px; border-radius: 8px; }
+.chip.idle { color: var(--green); border-color: rgba(45, 212, 167, 0.35); }
 </style>

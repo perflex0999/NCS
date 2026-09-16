@@ -1,77 +1,116 @@
 /* ============================================================
-   Bento Grids 设计系统 —— 智能充电桩运营服务平台
-   白卡片 + 圆角 + 软阴影 + 网格布局 + 新能源绿 + 微交互
+   NCS 深色科技主题 —— 参考 QT 项目「熠熠ee充电桩管理系统」
+   深蓝底 + 蓝青双色 + 玻璃拟态 + 光晕 + HUD 网格
    ============================================================ */
 :root {
-  /* Element Plus 主题覆盖 */
-  --el-color-primary: #22c55e;
-  --el-color-primary-light-3: #4ade80;
-  --el-color-primary-light-5: #86efac;
-  --el-color-primary-light-7: #bbf7d0;
-  --el-color-primary-light-8: #dcfce7;
-  --el-color-primary-light-9: #f0fdf4;
-  --el-color-primary-dark-2: #16a34a;
-  --el-color-success: #22c55e;
-  --el-color-warning: #f59e0b;
-  --el-color-danger: #ef4444;
+  /* 设计变量 */
+  --bg-deep: #040A16;
+  --bg-mid: #0A1428;
+  --panel: rgba(15, 26, 46, 0.52);
+  --panel-solid: #0D172A;
+  --border: rgba(99, 179, 255, 0.16);
+  --border-strong: rgba(0, 229, 255, 0.35);
+  --blue: #4D9FFF;
+  --cyan: #00E5FF;
+  --green: #2DD4A7;
+  --amber: #F5B544;
+  --red: #FF4D6A;
+  --violet: #A78BFA;
+  --text-main: #EAF0FA;
+  --text-sub: #7E8AA0;
+  --text-dim: #55617A;
+  --glow-blue: rgba(77, 159, 255, 0.45);
+  --glow-cyan: rgba(0, 229, 255, 0.35);
+
+  /* Element Plus 深色主题覆盖 */
+  --el-color-primary: #4D9FFF;
+  --el-color-primary-light-3: #6FB3FF;
+  --el-color-primary-light-5: #8FC4FF;
+  --el-color-primary-light-7: #B3D8FF;
+  --el-color-primary-light-8: #C9E5FF;
+  --el-color-primary-light-9: #E0F0FF;
+  --el-color-primary-dark-2: #3D8AE6;
+  --el-color-success: #2DD4A7;
+  --el-color-warning: #F5B544;
+  --el-color-danger: #FF4D6A;
+  --el-bg-color: #0D172A;
+  --el-bg-color-page: #040A16;
+  --el-bg-color-overlay: #0D172A;
+  --el-text-color-primary: #EAF0FA;
+  --el-text-color-regular: #C7D0E0;
+  --el-text-color-secondary: #7E8AA0;
+  --el-text-color-placeholder: #55617A;
+  --el-border-color: rgba(99, 179, 255, 0.18);
+  --el-border-color-light: rgba(99, 179, 255, 0.12);
+  --el-border-color-lighter: rgba(99, 179, 255, 0.08);
+  --el-fill-color: rgba(15, 26, 46, 0.6);
+  --el-fill-color-light: rgba(15, 26, 46, 0.4);
+  --el-fill-color-blank: rgba(15, 26, 46, 0.5);
   --el-border-radius-base: 10px;
   --el-border-radius-small: 8px;
-
-  /* 设计变量 */
-  --ncs-bg: #f5f5f7;
-  --ncs-card: #ffffff;
-  --ncs-text: #1d1d1f;
-  --ncs-text-2: #6e6e73;
-  --ncs-border: #e5e5ea;
-  --ncs-primary: #22c55e;
-  --ncs-primary-dark: #16a34a;
-  --ncs-radius: 16px;
-  --ncs-radius-sm: 12px;
-  --ncs-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.05);
-  --ncs-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.04), 0 16px 40px rgba(0, 0, 0, 0.10);
 }
 
 html, body {
-  background: var(--ncs-bg);
-  color: var(--ncs-text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--text-main);
+  font-family: "SF Pro Display", "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", "Helvetica", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background:
+    radial-gradient(ellipse 60% 50% at 18% -5%, rgba(0, 229, 255, 0.10) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 45% at 85% 105%, rgba(77, 159, 255, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 35% at 50% 50%, rgba(45, 212, 167, 0.05) 0%, transparent 60%),
+    linear-gradient(180deg, #040A16 0%, #081120 50%, #050C18 100%);
+  background-attachment: fixed;
 }
 
-/* 全局卡片（Bento 基础单元） */
-.ncs-card {
-  background: var(--ncs-card);
-  border-radius: var(--ncs-radius);
-  box-shadow: var(--ncs-shadow);
-  border: 1px solid rgba(0, 0, 0, 0.03);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* ===== 玻璃拟态面板（Bento 基础单元） ===== */
+.ncs-panel {
+  position: relative;
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: box-shadow 0.35s ease, border-color 0.35s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ncs-panel--hover:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.45), 0 0 22px var(--glow-blue);
+  transform: translateY(-2px);
 }
 
-.ncs-card--hover:hover {
-  transform: translateY(-3px) scale(1.01);
-  box-shadow: var(--ncs-shadow-hover);
-}
-
-/* Element Plus 卡片统一成 Bento 风格 */
+/* ===== Element Plus 组件深色化 ===== */
 .el-card {
-  border-radius: var(--ncs-radius);
-  border: 1px solid rgba(0, 0, 0, 0.03);
-  box-shadow: var(--ncs-shadow) !important;
+  background: var(--panel) !important;
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35) !important;
+  color: var(--text-main);
 }
-
-/* 表格卡片容器 */
-.ncs-table-card {
-  background: var(--ncs-card);
-  border-radius: var(--ncs-radius);
-  box-shadow: var(--ncs-shadow);
-  padding: 20px;
+.el-table, .el-table__inner-wrapper { background: transparent; }
+.el-table tr, .el-table th.el-table__cell { background: transparent !important; color: var(--text-sub) !important; }
+.el-table td.el-table__cell { background: transparent !important; border-bottom: 1px solid var(--border) !important; }
+.el-table::before { background-color: transparent !important; }
+.el-dialog { background: var(--panel-solid); border: 1px solid var(--border); border-radius: 16px; }
+.el-dialog__title { color: var(--text-main); }
+.el-input__wrapper, .el-textarea__inner {
+  background: rgba(15, 23, 38, 0.8) !important;
+  box-shadow: 0 0 0 1px var(--border) inset !important;
+  border-radius: 10px;
 }
+.el-input__wrapper.is-focus { box-shadow: 0 0 0 1px var(--blue) inset !important; }
 
-/* 入场动画（Motion 微交互） */
+/* ===== 入场动画 ===== */
 @keyframes ncs-fade-up {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
 }
+.ncs-enter { animation: ncs-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
-.ncs-enter {
-  animation: ncs-fade-up 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+/* ===== 页面切换过渡 ===== */
+.fade-slide-enter-active, .fade-slide-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
+.fade-slide-enter-from { opacity: 0; transform: translateX(18px); }
+.fade-slide-leave-to { opacity: 0; transform: translateX(-12px); }

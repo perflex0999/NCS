@@ -48,22 +48,31 @@ const onSubmit = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f0fdf4 0%, #f5f5f7 50%, #dcfce7 100%);
+  background:
+    radial-gradient(ellipse 60% 50% at 20% -10%, rgba(0, 229, 255, 0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 45% at 85% 110%, rgba(77, 159, 255, 0.16) 0%, transparent 55%),
+    linear-gradient(180deg, #040A16, #081120 55%, #050C18);
 }
 .login-card {
-  background: #fff;
+  background: rgba(13, 23, 42, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
   border-radius: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 24px 60px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 0 30px rgba(77, 159, 255, 0.08);
   padding: 40px;
   width: 380px;
 }
 .brand { display: flex; align-items: center; gap: 10px; }
 .brand-dot {
   width: 14px; height: 14px; border-radius: 50%;
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.15);
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  box-shadow: 0 0 14px var(--glow-cyan);
 }
-.brand h1 { font-size: 20px; margin: 0; }
-.sub { color: var(--ncs-text-2); font-size: 13px; margin: 8px 0 24px; }
-.submit { width: 100%; margin-top: 8px; }
+.brand h1 {
+  font-size: 20px; margin: 0; color: var(--text-main);
+  background: linear-gradient(90deg, #EAF0FA, #6FD4FF, #00E5FF);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.sub { color: var(--text-sub); font-size: 13px; margin: 8px 0 24px; }
+.submit { width: 100%; margin-top: 8px; background: linear-gradient(90deg, #4D9FFF, #00E5FF); border: none; color: #040A16; font-weight: 700; }
 </style>
