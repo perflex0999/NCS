@@ -4,5 +4,51 @@ server:
 spring:
   application:
     name: ncs-gateway
-
-# TODO(阶段3): 配置网关路由、Nacos 注册、Sentinel 限流
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR:localhost:8848}
+      config:
+        server-addr: ${NACOS_ADDR:localhost:8848}
+        file-extension: yaml
+    gateway:
+      routes:
+        - id: user
+          uri: lb://ncs-user
+          predicates:
+            - Path=/api/auth/**
+        - id: station
+          uri: lb://ncs-station
+          predicates:
+            - Path=/api/station/**
+        - id: charge
+          uri: lb://ncs-order
+          predicates:
+            - Path=/api/charge/**
+        - id: order
+          uri: lb://ncs-order
+          predicates:
+            - Path=/api/order/**
+        - id: admin-station
+          uri: lb://ncs-station
+          predicates:
+            - Path=/api/admin/station/**,/api/admin/device/**
+        - id: admin-order
+          uri: lb://ncs-order
+          predicates:
+            - Path=/api/admin/order/**
+        - id: admin-price
+          uri: lb://ncs-billing
+          predicates:
+            - Path=/api/admin/price/**
+        - id: admin-fault
+          uri: lb://ncs-fault
+          predicates:
+            - Path=/api/admin/fault/**
+        - id: admin-stats
+          uri: lb://ncs-statistics
+          predicates:
+            - Path=/api/admin/stats/**
+  config:
+    import:
+      - optional:nacos:ncs-gateway.yaml

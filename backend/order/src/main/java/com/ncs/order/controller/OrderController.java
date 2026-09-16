@@ -3,8 +3,8 @@ package com.ncs.order.controller;
 import com.ncs.common.api.Result;
 import com.ncs.order.dto.OrderVO;
 import com.ncs.order.service.OrderService;
-import com.ncs.order.web.UserContext;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,7 +21,7 @@ public class OrderController {
     }
 
     @GetMapping("/my")
-    public Result<List<OrderVO>> my() {
-        return Result.ok(orderService.myOrders(UserContext.get()));
+    public Result<List<OrderVO>> my(@RequestHeader("X-User-Id") Long userId) {
+        return Result.ok(orderService.myOrders(userId));
     }
 }

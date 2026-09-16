@@ -4,5 +4,22 @@ server:
 spring:
   application:
     name: ncs-fault
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR:localhost:8848}
+      config:
+        server-addr: ${NACOS_ADDR:localhost:8848}
+        file-extension: yaml
+  config:
+    import:
+      - optional:nacos:ncs-fault.yaml
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ncs?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: Ncs@123456
 
-# TODO(阶段3): 接入 Nacos 注册中心 + 配置中心
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true

@@ -2,6 +2,8 @@ package com.ncs.order.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.ncs.common.api.Result;
+import com.ncs.common.dto.PriceDTO;
 import com.ncs.common.exception.BizException;
 import com.ncs.order.dto.ChargeStatusVO;
 import com.ncs.order.dto.OrderVO;
@@ -9,8 +11,8 @@ import com.ncs.order.dto.StartChargeRequest;
 import com.ncs.order.dto.StartChargeResponse;
 import com.ncs.order.entity.ChargingOrder;
 import com.ncs.order.entity.Device;
-import com.ncs.order.entity.Price;
 import com.ncs.order.entity.Station;
+import com.ncs.order.feign.BillingClient;
 import com.ncs.order.mapper.DeviceMapper;
 import com.ncs.order.mapper.OrderMapper;
 import com.ncs.order.mapper.StationMapper;
@@ -26,7 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 /**
- * 充电核心业务：开始充电 / 查询当前充电 / 结束充电
+ * 充电核心业务：开始 / 查询 / 结束充电
  */
 @Service
 public class ChargeService {
@@ -35,15 +37,15 @@ public class ChargeService {
     private final DeviceMapper deviceMapper;
     private final OrderMapper orderMapper;
     private final StationMapper stationMapper;
-    private final PriceService priceService;
+    private final BillingClient billingClient;
 
     public ChargeService(RedisLock redisLock, DeviceMapper deviceMapper, OrderMapper orderMapper,
-                         StationMapper stationMapper, PriceService priceService) {
+                         StationMapper stationMapper, BillingClient billingClient) {
         this.redisLock = redisLock;
         this.deviceMapper = deviceMapper;
         this.orderMapper = orderMapper;
         this.stationMapper = stationMapper;
-        this.priceService = priceService;
+        this.billingClient = billingClient;
     }
 
     public StartChargeResponse start(Long userId, StartChargeRequest req) {
@@ -69,7 +71,9 @@ public class ChargeService {
                 throw new BizException("设备非空闲状态，无法开始充电");
             }
 
-            Price price = priceService.getCurrentPrice(device.getStationId(), device.getDeviceType());
+            // Feign 调用 billing 服务查询当前价格
+            Result<PriceDTO> priceResult = billingClient.getCurrentPrice(device.getStationId(), device.getDeviceType());
+            PriceDTO price = priceResult == null ? null : priceResult.getData();
             if (price == null) {
                 throw new BizException("该设备未配置价格，无法充电");
             }
@@ -142,7 +146,6 @@ public class ChargeService {
         order.setStatus(ChargingOrder.STATUS_FINISHED);
         orderMapper.updateById(order);
 
-        // 设备状态还原为空闲
         deviceMapper.update(null, new LambdaUpdateWrapper<Device>()
                 .set(Device::getStatus, Device.STATUS_IDLE)
                 .eq(Device::getId, device.getId()));

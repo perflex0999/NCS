@@ -4,6 +4,20 @@ server:
 spring:
   application:
     name: ncs-order
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR:localhost:8848}
+      config:
+        server-addr: ${NACOS_ADDR:localhost:8848}
+        file-extension: yaml
+    sentinel:
+      transport:
+        dashboard: ${SENTINEL_DASHBOARD:localhost:8858}
+        port: 8719
+  config:
+    import:
+      - optional:nacos:ncs-order.yaml
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/ncs?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
@@ -20,5 +34,3 @@ spring:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
-
-# TODO(阶段3): 接入 Nacos 注册中心 + 配置中心
