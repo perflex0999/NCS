@@ -4,5 +4,33 @@ server:
 spring:
   application:
     name: ncs-agent
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR:localhost:8848}
+      config:
+        server-addr: ${NACOS_ADDR:localhost:8848}
+        file-extension: yaml
+    sentinel:
+      transport:
+        dashboard: ${SENTINEL_DASHBOARD:localhost:8858}
+        port: 8720
+  config:
+    import:
+      - optional:nacos:ncs-agent.yaml
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ncs?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: ${DB_PASSWORD:}
 
-# TODO(阶段5): 接入大模型 API（key / base_url / model 放配置文件）
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+
+# 大模型配置（OpenAI 兼容，通过环境变量注入，可换 DeepSeek/通义等）
+llm:
+  base-url: ${LLM_BASE_URL:https://api.deepseek.com}
+  api-key: ${LLM_API_KEY:}
+  model: ${LLM_MODEL:deepseek-chat}
+  temperature: 0.7
