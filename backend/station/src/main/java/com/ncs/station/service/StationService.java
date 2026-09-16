@@ -53,6 +53,24 @@ public class StationService {
      */
     public List<StationVO> nearby(BigDecimal lat, BigDecimal lng, Integer deviceType, String sortBy) {
         String key = "ncs:nearby:" + (deviceType == null ? "all" : deviceType) + ":" + sortBy;
+        List<StationVO> cached = readCache(key);
+        if (cached != null) {
+            return cached;
+        }
+
+        // 缓存未命中时加锁回源，避免缓存失效瞬间大量并发击穿数据库
+        synchronized (this) {
+            cached = readCache(key);
+            if (cached != null) {
+                return cached;
+            }
+            List<StationVO> result = computeNearby(lat, lng, deviceType, sortBy);
+            writeCache(key, result, Duration.ofSeconds(60));
+            return result;
+        }
+    }
+
+    private List<StationVO> readCache(String key) {
         try {
             String cached = redisTemplate.opsForValue().get(key);
             if (cached != null) {
@@ -60,17 +78,17 @@ public class StationService {
                 });
             }
         } catch (Exception e) {
-            // 缓存异常则忽略，走数据库
+            // 缓存异常则忽略
         }
+        return null;
+    }
 
-        List<StationVO> result = computeNearby(lat, lng, deviceType, sortBy);
-
+    private void writeCache(String key, List<StationVO> result, Duration ttl) {
         try {
-            redisTemplate.opsForValue().set(key, objectMapper.writeValueAsString(result), Duration.ofSeconds(5));
+            redisTemplate.opsForValue().set(key, objectMapper.writeValueAsString(result), ttl);
         } catch (Exception e) {
             // 缓存写入失败忽略
         }
-        return result;
     }
 
     private List<StationVO> computeNearby(BigDecimal lat, BigDecimal lng, Integer deviceType, String sortBy) {
