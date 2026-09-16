@@ -77,7 +77,7 @@
 
       <!-- ===== 1. 查询充电站 2000 QPS ===== -->
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="查询充电站(2000QPS)" enabled="true">
-        <stringProp name="ThreadGroup.num_threads">400</stringProp>
+        <stringProp name="ThreadGroup.num_threads">600</stringProp>
         <stringProp name="ThreadGroup.ramp_time">20</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="循环控制器" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -105,7 +105,7 @@
 
       <!-- ===== 2. 查看设备状态 1000 QPS ===== -->
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="查看设备状态(1000QPS)" enabled="true">
-        <stringProp name="ThreadGroup.num_threads">200</stringProp>
+        <stringProp name="ThreadGroup.num_threads">300</stringProp>
         <stringProp name="ThreadGroup.ramp_time">20</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="循环控制器" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -132,7 +132,7 @@
 
       <!-- ===== 3. 开始充电 300 QPS ===== -->
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="开始充电(300QPS)" enabled="true">
-        <stringProp name="ThreadGroup.num_threads">100</stringProp>
+        <stringProp name="ThreadGroup.num_threads">200</stringProp>
         <stringProp name="ThreadGroup.ramp_time">20</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="循环控制器" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -192,7 +192,7 @@
 
       <!-- ===== 4. 结束充电 300 QPS ===== -->
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="结束充电(300QPS)" enabled="true">
-        <stringProp name="ThreadGroup.num_threads">100</stringProp>
+        <stringProp name="ThreadGroup.num_threads">200</stringProp>
         <stringProp name="ThreadGroup.ramp_time">20</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="循环控制器" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -228,7 +228,7 @@
 
       <!-- ===== 5. 用户登录 500 QPS ===== -->
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="用户登录(500QPS)" enabled="true">
-        <stringProp name="ThreadGroup.num_threads">100</stringProp>
+        <stringProp name="ThreadGroup.num_threads">200</stringProp>
         <stringProp name="ThreadGroup.ramp_time">20</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="循环控制器" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
