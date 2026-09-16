@@ -88,7 +88,8 @@ public class AgentService {
             llmClient.streamChat(messages, chunk -> {
                 full.append(chunk);
                 try {
-                    emitter.send(SseEmitter.event().data(chunk));
+                    // JSON 编码 chunk，避免换行符被 SSE 吞掉
+                    emitter.send(SseEmitter.event().data(objectMapper.writeValueAsString(chunk)));
                 } catch (Exception ignored) {
                 }
             });

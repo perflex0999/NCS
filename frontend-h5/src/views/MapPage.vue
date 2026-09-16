@@ -17,17 +17,17 @@
         :class="{ active: deviceType === c.value }" @click="selectCategory(c.value)">{{ c.text }}</div>
     </div>
 
-    <!-- 底部充电站抽屉（可上拉下拉） -->
-    <div class="sheet" :style="{ height: sheetHeight + 'px' }"
-      @touchstart="onTouchStart" @touchmove="onTouchMove" @touchend="onTouchEnd">
-      <div class="sheet-grabber"></div>
+    <!-- 底部充电站抽屉（可上拉下拉，抓手拖动、列表滚动加载） -->
+    <div class="sheet" :style="{ height: sheetHeight + 'px' }">
+      <div class="sheet-grabber"
+        @touchstart="onTouchStart" @touchmove="onTouchMove" @touchend="onTouchEnd"></div>
       <div class="sheet-header">
         <span class="sheet-title">附近充电站</span>
         <span class="sheet-count">共 {{ filteredStations.length }} 个</span>
       </div>
-      <div class="station-scroll">
-        <div v-for="(s, i) in filteredStations" :key="s.stationId" class="ncs-card station-mini ncs-enter"
-          :style="{ animationDelay: (i * 50) + 'ms' }" @click="goDetail(s)">
+      <div class="station-scroll" ref="scrollEl" @scroll="onScroll">
+        <div v-for="(s, i) in visibleStations" :key="s.stationId" class="ncs-card station-mini ncs-enter"
+          :style="{ animationDelay: (i % PAGE) * 50 + 'ms' }" @click="goDetail(s)">
           <div class="mini-head">
             <span class="name">{{ s.name }}</span>
             <span class="dist">{{ s.distanceKm ?? '-' }}km</span>
@@ -44,6 +44,7 @@
             <button class="go-btn" @click.stop="goDetail(s)">去充电</button>
           </div>
         </div>
+        <div v-if="visibleStations.length < filteredStations.length" class="load-more">上拉加载更多…</div>
         <van-empty v-if="!filteredStations.length" description="附近暂无充电站" />
       </div>
     </div>
@@ -55,7 +56,9 @@
         <span class="ai-bubble-close" @click.stop="dismissBubble">×</span>
       </div>
     </transition>
-    <div class="ai-ball" @click="goAssistant">
+    <div class="ai-ball" ref="ballEl"
+      :style="ballPos.x != null ? { left: ballPos.x + 'px', top: ballPos.y + 'px', right: 'auto', bottom: 'auto' } : {}"
+      @touchstart="onBallStart" @touchmove="onBallMove" @touchend="onBallEnd" @click="onBallClick">
       <span class="ai-ball-ico">🤖</span>
       <span class="ai-ball-pulse"></span>
     </div>
@@ -63,7 +66,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { nearbyStations } from '../api'
 
@@ -89,7 +92,7 @@ const filteredStations = computed(() => {
   return stations.value.filter(s => (type === 1 ? s.fastCount > 0 : s.slowCount > 0))
 })
 
-const selectCategory = (v) => { deviceType.value = v }
+const selectCategory = (v) => { deviceType.value = v; visibleCount.value = PAGE }
 
 function loadTMap() {
   return new Promise((resolve) => {
@@ -145,7 +148,7 @@ onMounted(async () => {
 
 const goDetail = (s) => router.push(`/station/${s.stationId}`)
 
-// 抽屉拖拽（上拉放大、下拉缩小）
+// 抽屉拖拽（仅抓手区上拉放大、下拉缩小，列表区正常滚动）
 const sheetHeight = ref(300)
 let dragging = false
 let startY = 0
@@ -163,6 +166,21 @@ const onTouchMove = (e) => {
 }
 const onTouchEnd = () => { dragging = false }
 
+// 列表分页：每次渲染 PAGE 条，滚到底部再加载下一批
+const PAGE = 12
+const visibleCount = ref(PAGE)
+const scrollEl = ref(null)
+const visibleStations = computed(() => filteredStations.value.slice(0, visibleCount.value))
+const onScroll = () => {
+  const el = scrollEl.value
+  if (!el) return
+  if (el.scrollTop + el.clientHeight >= el.scrollHeight - 30) {
+    if (visibleCount.value < filteredStations.value.length) {
+      visibleCount.value += PAGE
+    }
+  }
+}
+
 // AI 悬浮球 + 定期主动互动
 const showBubble = ref(false)
 const bubbleText = ref('')
@@ -175,6 +193,36 @@ let bubbleTimer = null
 let bubbleHideTimer = null
 const goAssistant = () => router.push('/assistant')
 const dismissBubble = () => { showBubble.value = false }
+
+// AI 悬浮球可随意拖动（区分点击与拖动）
+const ballEl = ref(null)
+const ballPos = reactive({ x: null, y: null })
+const BALL_SIZE = 52
+let ballDragging = false
+let ballMoved = false
+let ballStartX = 0
+let ballStartY = 0
+let ballOrigX = 0
+let ballOrigY = 0
+const onBallStart = (e) => {
+  const rect = ballEl.value.getBoundingClientRect()
+  ballOrigX = rect.left
+  ballOrigY = rect.top
+  ballStartX = e.touches[0].clientX
+  ballStartY = e.touches[0].clientY
+  ballDragging = true
+  ballMoved = false
+}
+const onBallMove = (e) => {
+  if (!ballDragging) return
+  const dx = e.touches[0].clientX - ballStartX
+  const dy = e.touches[0].clientY - ballStartY
+  if (Math.abs(dx) + Math.abs(dy) > 6) ballMoved = true
+  ballPos.x = Math.max(0, Math.min(window.innerWidth - BALL_SIZE, ballOrigX + dx))
+  ballPos.y = Math.max(0, Math.min(window.innerHeight - BALL_SIZE, ballOrigY + dy))
+}
+const onBallEnd = () => { ballDragging = false }
+const onBallClick = () => { if (!ballMoved) goAssistant() }
 const showGreeting = () => {
   bubbleText.value = greetings[Math.floor(Math.random() * greetings.length)]
   showBubble.value = true
@@ -223,13 +271,17 @@ onUnmounted(() => {
   padding: 8px 16px 20px;
   box-shadow: 0 -8px 30px rgba(40, 60, 90, 0.12);
   display: flex; flex-direction: column;
-  transition: height 0.1s linear;
 }
-.sheet-grabber { width: 40px; height: 4px; border-radius: 2px; background: #E6EBF2; margin: 4px auto 8px; }
+.sheet-grabber {
+  width: 100%; height: 24px; display: flex; align-items: center; justify-content: center;
+  touch-action: none; cursor: grab;
+}
+.sheet-grabber::before { content: ''; width: 40px; height: 4px; border-radius: 2px; background: #E6EBF2; }
 .sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 4px 4px 10px; }
 .sheet-title { font-size: 15px; font-weight: 700; color: #2A3240; }
 .sheet-count { font-size: 12px; color: #8B93A1; }
-.station-scroll { overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 4px; }
+.station-scroll { overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+.load-more { text-align: center; font-size: 12px; color: #B0B7C3; padding: 10px 0 4px; }
 .station-mini { padding: 14px; cursor: pointer; }
 .mini-head { display: flex; justify-content: space-between; align-items: center; }
 .name { font-size: 16px; font-weight: 700; color: #2A3240; }
@@ -255,6 +307,9 @@ onUnmounted(() => {
   box-shadow: 0 6px 20px rgba(62, 201, 192, 0.4);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .ai-ball-ico { font-size: 26px; }
 .ai-ball-pulse {

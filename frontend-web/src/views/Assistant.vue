@@ -40,7 +40,7 @@ import { marked } from 'marked'
 import { getToken } from '../utils/auth'
 import { agentHistory, clearAgentHistory } from '../api'
 
-const renderMd = (text) => marked.parse(text || '')
+const renderMd = (text) => marked.parse(text || '', { breaks: true })
 
 const scenarios = [
   { value: 'ops_assistant', text: 'AI 运营助手', icon: '📊', hint: '「今天哪个充电站订单最多？」' },
@@ -103,8 +103,10 @@ const streamChat = async (scenarioVal, message, onChunk) => {
       const line = buffer.slice(0, idx).trim()
       buffer = buffer.slice(idx + 1)
       if (line.startsWith('data:')) {
-        const content = line.slice(5).trim()
-        if (content && content !== '[DONE]') onChunk(content)
+        const raw = line.slice(5).trim()
+        if (raw && raw !== '[DONE]') {
+          try { onChunk(JSON.parse(raw)) } catch (e) { onChunk(raw) }
+        }
       }
     }
   }

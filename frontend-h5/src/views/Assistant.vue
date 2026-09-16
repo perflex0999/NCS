@@ -45,8 +45,8 @@ import { marked } from 'marked'
 import { getToken } from '../utils/auth'
 import { agentHistory, clearAgentHistory } from '../api'
 
-// Markdown 渲染：**加粗**、换行、列表、标题
-const renderMd = (text) => marked.parse(text || '')
+// Markdown 渲染：**加粗**、换行、列表、标题（breaks:true 让单个换行也渲染成 <br>）
+const renderMd = (text) => marked.parse(text || '', { breaks: true })
 
 const scenarios = [
   { value: 'user_assistant', text: '用户充电助手', icon: '⚡', hint: '「附近哪里有空闲的快充？」' },
@@ -110,8 +110,10 @@ const streamChat = async (scenarioVal, message, onChunk) => {
       const line = buffer.slice(0, idx).trim()
       buffer = buffer.slice(idx + 1)
       if (line.startsWith('data:')) {
-        const content = line.slice(5).trim()
-        if (content && content !== '[DONE]') onChunk(content)
+        const raw = line.slice(5).trim()
+        if (raw && raw !== '[DONE]') {
+          try { onChunk(JSON.parse(raw)) } catch (e) { onChunk(raw) }
+        }
       }
     }
   }
