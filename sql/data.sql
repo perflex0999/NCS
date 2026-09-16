@@ -30,3 +30,8 @@ INSERT INTO t_price (station_id, device_type, start_time, end_time, elec_price, 
 (2, 1, '00:00:00', '24:00:00', 0.9000, 0.5000),
 (2, 2, '00:00:00', '24:00:00', 0.7000, 0.3000),
 (3, 1, '00:00:00', '24:00:00', 0.7500, 0.3500);
+
+-- 示例故障
+INSERT INTO t_fault (device_id, device_no, fault_type, fault_time, description, status) VALUES
+(6, 'DEV-3001', '充电枪无法启动', NOW(), '用户反馈充电枪插入后无法启动', 0),
+(1, 'DEV-1001', '通信超时', NOW(), '设备离线，通信超时', 1);

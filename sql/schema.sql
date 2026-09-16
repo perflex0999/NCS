@@ -77,3 +77,17 @@ CREATE TABLE IF NOT EXISTS t_charging_order (
     KEY idx_device (device_id),
     KEY idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='充电订单表';
+
+-- 故障表
+CREATE TABLE IF NOT EXISTS t_fault (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    device_id BIGINT NOT NULL COMMENT '故障设备ID',
+    device_no VARCHAR(50) DEFAULT NULL COMMENT '设备编号',
+    fault_type VARCHAR(50) DEFAULT NULL COMMENT '故障类型',
+    fault_time DATETIME DEFAULT NULL COMMENT '故障时间',
+    description VARCHAR(500) DEFAULT NULL COMMENT '故障描述',
+    status TINYINT NOT NULL DEFAULT 0 COMMENT '0待处理 1处理中 2已处理',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_device (device_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='故障表';
