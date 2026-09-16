@@ -146,8 +146,8 @@ const onTouchStart = (e) => {
 const onTouchMove = (e) => {
   if (!dragging) return
   const dy = startY - e.touches[0].clientY
-  const maxH = window.innerHeight * 0.62
-  sheetHeight.value = Math.max(220, Math.min(maxH, startH + dy))
+  const maxH = window.innerHeight * 0.88
+  sheetHeight.value = Math.max(120, Math.min(maxH, startH + dy))
 }
 const onTouchEnd = () => { dragging = false }
 </script>

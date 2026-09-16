@@ -2,7 +2,7 @@
   <el-container class="layout">
     <el-aside width="220px" class="aside">
       <div class="logo">
-        <span class="logo-dot"></span>
+        <img class="logo-img" :src="logoUrl" alt="熠熠ee" />
         <span class="logo-text">熠熠ee</span>
       </div>
       <el-menu :default-active="$route.path" router class="menu">
@@ -36,6 +36,7 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { clearToken } from '../utils/auth'
+import logoUrl from '../assets/logo.png'
 
 const router = useRouter()
 const logout = () => {
@@ -56,11 +57,7 @@ const openBigScreen = () => {
   flex-direction: column;
 }
 .logo { display: flex; align-items: center; gap: 10px; padding: 20px; }
-.logo-dot {
-  width: 12px; height: 12px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--blue), var(--cyan));
-  box-shadow: 0 0 12px var(--glow-cyan);
-}
+.logo-img { width: 30px; height: 30px; }
 .logo-text { font-weight: 700; font-size: 16px; color: var(--text-main); letter-spacing: 1px; }
 .menu { border-right: none; background: transparent; padding: 0 10px; }
 .menu :deep(.el-menu-item) {

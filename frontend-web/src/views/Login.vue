@@ -2,7 +2,7 @@
   <div class="login-wrap">
     <div class="login-card ncs-enter">
       <div class="brand">
-        <div class="brand-dot"></div>
+        <img class="brand-logo" :src="logoUrl" alt="熠熠ee" />
         <h1>熠熠ee 充电运营管理后台</h1>
       </div>
       <p class="sub">智能充电桩运营服务平台</p>
@@ -25,6 +25,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { login } from '../api'
 import { setToken } from '../utils/auth'
+import logoUrl from '../assets/logo.png'
 
 const router = useRouter()
 const phone = ref('13800000001')
@@ -62,12 +63,8 @@ const onSubmit = async () => {
   padding: 40px;
   width: 380px;
 }
-.brand { display: flex; align-items: center; gap: 10px; }
-.brand-dot {
-  width: 14px; height: 14px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--blue), var(--cyan));
-  box-shadow: 0 0 14px var(--glow-cyan);
-}
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand-logo { width: 44px; height: 44px; }
 .brand h1 {
   font-size: 20px; margin: 0; color: var(--text-main);
   background: linear-gradient(90deg, #EAF0FA, #6FD4FF, #00E5FF);

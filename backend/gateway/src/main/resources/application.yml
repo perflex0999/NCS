@@ -57,6 +57,10 @@ spring:
           uri: lb://ncs-order
           predicates:
             - Path=/api/reserve/**
+        - id: bigscreen
+          uri: lb://ncs-statistics
+          predicates:
+            - Path=/api/bigscreen/**
   config:
     import:
       - optional:nacos:ncs-gateway.yaml

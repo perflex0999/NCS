@@ -22,7 +22,8 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     private static final List<String> PUBLIC_PREFIXES = List.of(
             "/api/auth/login",
-            "/api/station/"
+            "/api/station/",
+            "/api/bigscreen/"
     );
 
     @Override
