@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RestController
 @RequestMapping("/api/admin/price")
@@ -27,13 +27,15 @@ public class AdminPriceController {
     }
 
     @GetMapping("/list")
-    public Result<List<Price>> list(@RequestParam(required = false) Long stationId) {
+    public Result<Page<Price>> list(@RequestParam(required = false) Long stationId,
+                                    @RequestParam(defaultValue = "1") Integer page,
+                                    @RequestParam(defaultValue = "10") Integer pageSize) {
         LambdaQueryWrapper<Price> qw = new LambdaQueryWrapper<>();
         if (stationId != null) {
             qw.eq(Price::getStationId, stationId);
         }
         qw.orderByAsc(Price::getStationId).orderByAsc(Price::getDeviceType).orderByAsc(Price::getStartTime);
-        return Result.ok(priceMapper.selectList(qw));
+        return Result.ok(priceMapper.selectPage(new Page<>(page, pageSize), qw));
     }
 
     @PostMapping

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RestController
 @RequestMapping("/api/admin/order")
@@ -26,11 +26,13 @@ public class AdminOrderController {
     }
 
     @GetMapping("/list")
-    public Result<List<ChargingOrder>> list(@RequestParam(required = false) Long userId,
+    public Result<Page<ChargingOrder>> list(@RequestParam(required = false) Long userId,
                                             @RequestParam(required = false) Long stationId,
                                             @RequestParam(required = false) Integer status,
                                             @RequestParam(required = false) String startTime,
-                                            @RequestParam(required = false) String endTime) {
+                                            @RequestParam(required = false) String endTime,
+                                            @RequestParam(defaultValue = "1") Integer page,
+                                            @RequestParam(defaultValue = "10") Integer pageSize) {
         LambdaQueryWrapper<ChargingOrder> qw = new LambdaQueryWrapper<>();
         if (userId != null) {
             qw.eq(ChargingOrder::getUserId, userId);
@@ -48,7 +50,7 @@ public class AdminOrderController {
             qw.le(ChargingOrder::getStartTime, parseTime(endTime, true));
         }
         qw.orderByDesc(ChargingOrder::getStartTime);
-        return Result.ok(orderMapper.selectList(qw));
+        return Result.ok(orderMapper.selectPage(new Page<>(page, pageSize), qw));
     }
 
     private LocalDateTime parseTime(String s, boolean endOfDay) {

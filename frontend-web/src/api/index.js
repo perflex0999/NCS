@@ -24,7 +24,7 @@ export const priceUpdate = (id, data) => request.put(`/api/admin/price/${id}`, d
 export const priceDelete = (id) => request.delete(`/api/admin/price/${id}`)
 
 // 故障
-export const faultList = () => request.get('/api/admin/fault/list')
+export const faultList = (params) => request.get('/api/admin/fault/list', { params })
 export const faultCreate = (data) => request.post('/api/admin/fault', data)
 export const faultUpdate = (id, data) => request.put(`/api/admin/fault/${id}`, data)
 export const faultDelete = (id) => request.delete(`/api/admin/fault/${id}`)

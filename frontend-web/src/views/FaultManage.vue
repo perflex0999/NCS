@@ -21,6 +21,17 @@
       </el-table-column>
     </el-table>
 
+    <el-pagination
+      v-model:current-page="page"
+      v-model:page-size="pageSize"
+      :total="total"
+      :page-sizes="[10, 20, 50, 100]"
+      layout="total, sizes, prev, pager, next"
+      @size-change="handleSizeChange"
+      @current-change="load"
+      style="margin-top: 16px;"
+    />
+
     <el-dialog v-model="dialogVisible" :title="form.id ? '处理故障' : '记录故障'" width="500px">
       <el-form :model="form" label-width="90px">
         <el-form-item label="故障设备"><el-input v-model="form.deviceNo" placeholder="如 DEV-3001" :disabled="!!form.id" /></el-form-item>
@@ -50,13 +61,21 @@ import { faultList, faultCreate, faultUpdate, faultDelete } from '../api'
 const list = ref([])
 const dialogVisible = ref(false)
 const form = ref({})
+const page = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
 
 const statusTextMap = { 0: '待处理', 1: '处理中', 2: '已处理' }
 const statusTagMap = { 0: 'danger', 1: 'warning', 2: 'success' }
 const statusText = (s) => statusTextMap[s] ?? '未知'
 const statusTag = (s) => statusTagMap[s] ?? 'info'
 
-const load = async () => { list.value = await faultList() }
+const load = async () => {
+  const res = await faultList({ page: page.value, pageSize: pageSize.value })
+  list.value = res.records || []
+  total.value = res.total || 0
+}
+const handleSizeChange = () => { page.value = 1; load() }
 const openCreate = () => { form.value = { status: 0 }; dialogVisible.value = true }
 const openEdit = (row) => { form.value = { ...row }; dialogVisible.value = true }
 

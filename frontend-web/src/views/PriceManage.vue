@@ -2,7 +2,7 @@
   <div>
     <el-form inline>
       <el-form-item label="充电站">
-        <el-select v-model="stationId" clearable filterable placeholder="全部" style="width: 200px" @change="load">
+        <el-select v-model="stationId" clearable filterable placeholder="全部" style="width: 200px" @change="handleFilterChange">
           <el-option v-for="s in stations" :key="s.id" :label="s.name" :value="s.id" />
         </el-select>
       </el-form-item>
@@ -28,6 +28,17 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <el-pagination
+      v-model:current-page="page"
+      v-model:page-size="pageSize"
+      :total="total"
+      :page-sizes="[10, 20, 50, 100]"
+      layout="total, sizes, prev, pager, next"
+      @size-change="handleSizeChange"
+      @current-change="load"
+      style="margin-top: 16px;"
+    />
 
     <el-dialog v-model="dialogVisible" :title="form.id ? '编辑价格' : '新增价格'" width="500px">
       <el-form :model="form" label-width="110px">
@@ -69,12 +80,19 @@ const stations = ref([])
 const stationId = ref(null)
 const dialogVisible = ref(false)
 const form = ref({})
+const page = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
 
 const stationName = (id) => stations.value.find(s => s.id === id)?.name || '-'
 
 const load = async () => {
-  list.value = await priceList({ stationId: stationId.value })
+  const res = await priceList({ stationId: stationId.value, page: page.value, pageSize: pageSize.value })
+  list.value = res.records || []
+  total.value = res.total || 0
 }
+const handleFilterChange = () => { page.value = 1; load() }
+const handleSizeChange = () => { page.value = 1; load() }
 const loadStations = async () => { stations.value = await stationList() }
 
 const openCreate = () => { form.value = { deviceType: 1 }; dialogVisible.value = true }

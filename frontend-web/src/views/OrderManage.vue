@@ -2,7 +2,7 @@
   <div>
     <el-form inline>
       <el-form-item label="用户ID">
-        <el-input v-model="query.userId" placeholder="用户ID" clearable style="width: 140px" @keyup.enter="load" />
+        <el-input v-model="query.userId" placeholder="用户ID" clearable style="width: 140px" @keyup.enter="handleSearch" />
       </el-form-item>
       <el-form-item label="充电站">
         <el-select v-model="query.stationId" clearable filterable placeholder="全部" style="width: 180px">
@@ -19,7 +19,7 @@
       <el-form-item label="时间范围">
         <el-date-picker v-model="dateRange" type="daterange" value-format="YYYY-MM-DD" start-placeholder="开始" end-placeholder="结束" />
       </el-form-item>
-      <el-button type="primary" @click="load">查询</el-button>
+      <el-button type="primary" @click="handleSearch">查询</el-button>
     </el-form>
 
     <el-table :data="list" border>
@@ -39,6 +39,17 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <el-pagination
+      v-model:current-page="page"
+      v-model:page-size="pageSize"
+      :total="total"
+      :page-sizes="[10, 20, 50, 100]"
+      layout="total, sizes, prev, pager, next"
+      @size-change="handleSizeChange"
+      @current-change="load"
+      style="margin-top: 16px;"
+    />
   </div>
 </template>
 
@@ -50,6 +61,9 @@ const list = ref([])
 const stations = ref([])
 const dateRange = ref(null)
 const query = reactive({ userId: null, stationId: null, status: null })
+const page = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
 
 const statusTextMap = { 0: '充电中', 1: '已完成', 2: '已支付' }
 const statusTagMap = { 0: 'warning', 1: 'success', 2: 'info' }
@@ -59,14 +73,20 @@ const statusTag = (s) => statusTagMap[s] ?? 'info'
 const stationName = (id) => stations.value.find(s => s.id === id)?.name || '-'
 
 const load = async () => {
-  list.value = await orderList({
+  const res = await orderList({
     userId: query.userId || null,
     stationId: query.stationId || null,
     status: query.status ?? null,
     startTime: dateRange.value?.[0] || null,
-    endTime: dateRange.value?.[1] || null
+    endTime: dateRange.value?.[1] || null,
+    page: page.value,
+    pageSize: pageSize.value
   })
+  list.value = res.records || []
+  total.value = res.total || 0
 }
+const handleSearch = () => { page.value = 1; load() }
+const handleSizeChange = () => { page.value = 1; load() }
 
 onMounted(async () => {
   stations.value = await stationList()
